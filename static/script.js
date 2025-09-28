@@ -60,10 +60,24 @@ function showGameSection() {
   showSection("game-section");
 }
 
-// Hàm vẽ bàn cờ
+// Hàm vẽ bàn cờ với ánh xạ tên file mới
 function drawBoard(board) {
   if (!boardDiv || !Array.isArray(board) || board.length !== 8) return;
   boardDiv.innerHTML = "";
+  const pieceMap = {
+    wp: "TotTrang", // Tốt trắng (Pawn)
+    bp: "TotDen", // Tốt đen (Pawn)
+    wR: "XeTrang", // Xe trắng (Rook) - Giả định
+    bR: "XeDen", // Xe đen (Rook) - Giả định
+    wN: "MaTrang", // Mã trắng (Knight)
+    bN: "MaDen", // Mã đen (Knight)
+    wB: "TuongTrang", // Tướng trắng (Bishop)
+    bB: "TuongDen", // Tướng đen (Bishop)
+    wQ: "HauTrang", // Hậu trắng (Queen)
+    bQ: "HauDen", // Hậu đen (Queen)
+    wK: "VuaTrang", // Vua trắng (King)
+    bK: "VuaDen", // Vua đen (King)
+  };
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const square = document.createElement("div");
@@ -75,7 +89,7 @@ function drawBoard(board) {
       const piece = board[row][col];
       if (piece !== "--") {
         const img = document.createElement("img");
-        const imgSrc = `/static/images/${piece.toUpperCase()}.png`;
+        const imgSrc = `/static/images/${pieceMap[piece] || piece}.png`;
         img.src = imgSrc;
         img.alt = piece;
         img.onload = () => console.log("Tải ảnh thành công:", imgSrc);
