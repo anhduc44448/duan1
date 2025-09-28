@@ -76,7 +76,7 @@ function drawBoard(board) {
     wQ: "HauTrang", // Hậu trắng (Queen)
     bQ: "HauDen", // Hậu đen (Queen)
     wK: "VuaTrang", // Vua trắng (King)
-    bK: "VuaDen", // Vua đen (King)
+    bK: "VuaDen", // Vua đen (King
   };
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
