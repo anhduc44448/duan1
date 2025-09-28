@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Chess AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <a href="#" onclick="showSection('home-section')">Trang Chủ</a>
+        <button onclick="showSection('guide-section')">Hướng Dẫn Chơi</button>
+        <button onclick="showSection('contact-section')">Liên Hệ</button>
+    </div>
+
+    <div class="content">
+        <!-- Trang chủ -->
+        <div id="home-section" class="section">
+            <div class="home-container">
+                <h1><i class="fas fa-chess"></i> Realtime Chess AI</h1>
+                <p class="slogan">Trải nghiệm cờ vua thời gian thực với trí tuệ nhân tạo đỉnh cao!</p>
+                <div class="features">
+                    <div class="feature-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Đối kháng trực tiếp</h3>
+                        <p>Chơi với bạn bè hoặc người chơi toàn cầu.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI thông minh</h3>
+                        <p>Thách đấu với AI mạnh mẽ mọi lúc.</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-sync-alt"></i>
+                        <h3>Thời gian thực</h3>
+                        <p>Trận đấu mượt mà, không gián đoạn.</p>
+                    </div>
+                </div>
+                <button class="play-button" onclick="showSection('mode-section')"><i class="fas fa-play"></i> Bắt Đầu
+                    Chơi</button>
+            </div>
+        </div>
+
+        <!-- Hướng dẫn chơi -->
+        <div id="guide-section" class="section">
+            <h2>Hướng Dẫn Chơi</h2>
+            <p>1. Chọn chế độ chơi: Đánh với Người hoặc Đánh với Máy.</p>
+            <p>2. Nếu chọn Đánh với Người, nhập Room ID để tham gia phòng.</p>
+            <p>3. Nhấn vào quân cờ để chọn, sau đó chọn ô đích để di chuyển.</p>
+            <p>4. Trò chơi kết thúc khi có chiếu hết hoặc hòa cờ.</p>
+            <button onclick="showSection('home-section')">Quay Lại</button>
+        </div>
+
+        <!-- Liên hệ -->
+        <div id="contact-section" class="section">
+            <h2>Liên Hệ</h2>
+            <p>Email: support@chessai.com</p>
+            <p>Website: www.chessai.com</p>
+            <button onclick="showSection('home-section')">Quay Lại</button>
+        </div>
+
+        <!-- Section chọn mode -->
+        <div id="mode-section" class="section">
+            <h2>Chọn Chế Độ Chơi</h2>
+            <div class="mode-options">
+                <label onclick="selectMode('multi')">
+                    <i class="fas fa-users fa-3x"></i><br>
+                    Đánh với Người
+                </label>
+                <label onclick="selectMode('ai')">
+                    <i class="fas fa-robot fa-3x"></i><br>
+                    Đánh với Máy
+                </label>
+            </div>
+        </div>
+
+        <!-- Section nhập room cho multi -->
+        <div id="multi-room-section" class="section">
+            <h2>Đánh với Người</h2>
+            <input type="text" id="roomInput" placeholder="Nhập Room ID">
+            <button onclick="joinRoom()"><i class="fas fa-sign-in-alt"></i> Join / Create Room</button>
+            <p id="status">Chưa tham gia phòng</p>
+        </div>
+
+        <!-- Section bàn cờ -->
+        <div id="game-section" class="section">
+            <div id="turn"></div>
+            <div id="chessboard"></div>
+            <button onclick="resetBoard()"><i class="fas fa-sync-alt"></i> Reset Room</button>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+
+</html>
