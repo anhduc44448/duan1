@@ -95,7 +95,7 @@ function drawBoard(board) {
         img.onload = () => console.log("Tải ảnh thành công:", imgSrc);
         img.onerror = () => {
           console.error("Lỗi tải ảnh:", imgSrc, "Fallback to default.png");
-          img.src = "/static/images/default.png";
+          img.src = "./static/images/default.png";
         };
         square.appendChild(img);
       }
