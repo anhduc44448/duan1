@@ -89,7 +89,7 @@ function drawBoard(board) {
       const piece = board[row][col];
       if (piece !== "--") {
         const img = document.createElement("img");
-        const imgSrc = `./static/images/${pieceMap[piece] || piece}.png`;
+        const imgSrc = `./images/${pieceMap[piece] || piece}.png`;
         img.src = imgSrc;
         img.alt = piece;
         img.onload = () => console.log("Tải ảnh thành công:", imgSrc);
