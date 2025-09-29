@@ -65,18 +65,18 @@ function drawBoard(board) {
   if (!boardDiv || !Array.isArray(board) || board.length !== 8) return;
   boardDiv.innerHTML = "";
   const pieceMap = {
-    wp: "TotTrang", // Tốt trắng (Pawn)
-    bp: "TotDen", // Tốt đen (Pawn)
-    wR: "XeTrang", // Xe trắng (Rook) - Giả định
-    bR: "XeDen", // Xe đen (Rook) - Giả định
-    wN: "MaTrang", // Mã trắng (Knight)
-    bN: "MaDen", // Mã đen (Knight)
-    wB: "TuongTrang", // Tướng trắng (Bishop)
-    bB: "TuongDen", // Tướng đen (Bishop)
-    wQ: "HauTrang", // Hậu trắng (Queen)
-    bQ: "HauDen", // Hậu đen (Queen)
-    wK: "VuaTrang", // Vua trắng (King)
-    bK: "VuaDen", // Vua đen (King
+    wp: "tottrang", // Tốt trắng (Pawn)
+    bp: "totden", // Tốt đen (Pawn)
+    wR: "xetrang", // Xe trắng (Rook) - Giả định
+    bR: "xeden", // Xe đen (Rook) - Giả định
+    wN: "matrang", // Mã trắng (Knight)
+    bN: "maden", // Mã đen (Knight)
+    wB: "tuongtrang", // Tướng trắng (Bishop)
+    bB: "tuongden", // Tướng đen (Bishop)
+    wQ: "hautrang", // Hậu trắng (Queen)
+    bQ: "hauden", // Hậu đen (Queen)
+    wK: "vuatrang", // Vua trắng (King)
+    bK: "vuaden", // Vua đen (King)
   };
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
