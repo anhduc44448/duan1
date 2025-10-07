@@ -1,3 +1,4 @@
+/* Sync: Main theme hồng gradient cho toàn app */
 body {
   background: linear-gradient(90deg, #ffafcc, #a2d2ff);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -16,33 +17,45 @@ body {
   padding: 10px 30px;
   background: rgba(255, 182, 193, 0.95);
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  gap: 20px;
   position: fixed;
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  height: 60px;
 }
 
-.header a,
-.header button {
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 40px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.logo-img:hover {
+  transform: scale(1.1);
+}
+
+.nav-links {
+  display: flex;
+  gap: 15px;
+}
+
+.nav-links a {
   color: #fff;
   text-decoration: none;
-  background: none;
-  border: none;
   font-size: 16px;
-  cursor: pointer;
   padding: 8px 15px;
   transition: color 0.3s, transform 0.3s;
-  text-align: center;
-  white-space: nowrap;
-  min-width: 100px;
   border-radius: 6px;
 }
 
-.header a:hover,
-.header button:hover {
+.nav-links a:hover {
   color: #ff69b4;
   transform: translateY(-2px);
 }
@@ -52,17 +65,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 70px;
+  padding-top: 60px;
   width: 100%;
 }
 
 .section {
-  max-width: 1400px;
-  margin: 15px auto;
-  padding: 20px 30px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 30px;
   background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   display: none;
   text-align: center;
   overflow: hidden;
@@ -72,40 +84,31 @@ body {
   display: block;
 }
 
-/* Trang chủ vừa màn hình, rộng ngang */
+/* Sync: Hero & features match theme hồng */
 .home-hero {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 30px;
-  margin-bottom: 20px;
-  padding: 15px 20px;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  min-height: 300px; /* Đảm bảo chiều cao tối thiểu */
+  padding: 0 60px;
+  background: rgba(255, 255, 255, 0.9);
+  min-height: 500px;
+  margin-top: 0;
+  position: relative;
+  align-items: center;
 }
 
 .home-text {
-  flex: 2;
   text-align: left;
-  padding-right: 20px;
+  padding-left: 40px;
+  z-index: 10;
 }
 
-.home-text h1 {
-  font-size: 2.8em;
+.home-text h2 {
+  font-size: 3.5em;
   color: #ff69b4;
-  margin-bottom: 10px;
+  margin: 20px 0;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
   animation: fadeIn 1s ease-in;
-}
-
-.home-text .slogan {
-  font-size: 1.5em;
-  color: #444;
-  margin-bottom: 10px;
-  font-weight: 500;
-  animation: slideIn 1s ease-in;
 }
 
 .play-button {
@@ -113,12 +116,13 @@ body {
   color: white;
   border: none;
   border-radius: 25px;
-  padding: 12px 35px;
-  font-size: 1.5em;
+  padding: 15px 40px;
+  font-size: 1.8em;
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(255, 105, 180, 0.4);
   transition: all 0.4s;
-  animation: bounceIn 1.5s ease-in-out;
+  animation: bounceIn 0.8s ease-in-out;
+  margin-top: 20px;
 }
 
 .play-button:hover {
@@ -127,47 +131,42 @@ body {
 }
 
 .home-image {
-  flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 600px;
 }
 
 .chess-preview {
   width: 100%;
-  max-width: 500px; /* Tăng kích thước tối đa để rõ hơn */
   height: auto;
-  object-fit: contain; /* Giữ nguyên nội dung, không bị cắt */
+  object-fit: contain;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  animation: zoomIn 1.5s ease-in;
+  animation: zoomIn 1.2s ease-in;
 }
 
 .home-features {
-  padding: 20px;
+  padding: 40px 60px;
   background: rgba(255, 255, 255, 0.7);
-  border-radius: 12px;
-  margin-top: 20px;
 }
 
 .home-features h2 {
-  font-size: 2em;
+  font-size: 2.5em;
   color: #ff69b4;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 30px;
   padding: 10px;
-  height: 180px;
-  overflow: hidden;
 }
 
 .feature-card {
   background: #fff;
-  padding: 15px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -201,23 +200,12 @@ body {
   margin: 0;
 }
 
-/* Hiệu ứng animation */
+/* Sync: Animations chung cho toàn app */
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
   to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(-100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
     opacity: 1;
   }
 }
@@ -247,28 +235,7 @@ body {
   }
 }
 
-/* Các phần khác */
-.mode-options {
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-}
-
-.mode-options label {
-  font-size: 18px;
-  cursor: pointer;
-  background: rgba(255, 182, 193, 0.7);
-  padding: 15px 20px;
-  border-radius: 10px;
-  transition: transform 0.3s, background 0.3s;
-}
-
-.mode-options label:hover {
-  transform: scale(1.05);
-  background: rgba(255, 105, 180, 0.8);
-}
-
+/* Sync: Chessboard & buttons */
 input[type="text"] {
   padding: 10px;
   width: 250px;
@@ -293,9 +260,20 @@ button:hover {
   transform: translateY(-2px);
 }
 
+button:focus,
+input:focus {
+  outline: 2px solid #ff69b4;
+  outline-offset: 2px;
+}
+
 #chessboard {
   margin: 15px auto;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  display: grid;
+  grid-template-columns: repeat(8, 62.5px);
+  grid-template-rows: repeat(8, 62.5px);
+  width: 500px;
+  height: 500px;
 }
 
 #turn {
@@ -308,91 +286,6 @@ button:hover {
 #status {
   color: #6c757d;
   margin-top: 10px;
-}
-
-@media (max-width: 1000px) {
-  .feature-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .home-hero {
-    padding: 15px;
-    gap: 20px;
-  }
-  .home-text {
-    padding-right: 15px;
-  }
-  .chess-preview {
-    max-width: 400px;
-  }
-}
-
-@media (max-width: 600px) {
-  .header {
-    justify-content: center;
-    padding: 10px;
-    flex-wrap: wrap;
-  }
-  .content {
-    padding-top: 60px;
-  }
-  .home-hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 10px;
-    gap: 15px;
-    min-height: 250px;
-  }
-  .home-text h1 {
-    font-size: 2em;
-  }
-  .home-text .slogan {
-    font-size: 1.2em;
-  }
-  .play-button {
-    font-size: 1.3em;
-    padding: 10px 30px;
-  }
-  .chess-preview {
-    max-width: 250px;
-  }
-  .feature-grid {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-  .feature-card {
-    padding: 10px;
-  }
-  .mode-options {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .header a,
-  .header button {
-    min-width: 80px;
-    margin: 5px 0;
-  }
-  #chessboard {
-    width: 300px !important;
-    height: 300px !important;
-    grid-template-columns: repeat(8, 37.5px) !important;
-    grid-template-rows: repeat(8, 37.5px) !important;
-  }
-  .square {
-    width: 37.5px !important;
-    height: 37.5px !important;
-  }
-  .square img {
-    width: 35px !important;
-    height: 35px !important;
-  }
-}
-
-#chessboard {
-  display: grid;
-  grid-template-columns: repeat(8, 62.5px);
-  grid-template-rows: repeat(8, 62.5px);
-  width: 500px;
-  height: 500px;
 }
 
 .square {
@@ -415,4 +308,117 @@ button:hover {
   width: 60px;
   height: 60px;
   pointer-events: none;
+}
+
+.square.selected {
+  background-color: rgba(0, 128, 255, 0.3);
+  outline: 3px solid blue;
+}
+
+/* Sync: Responsive cho main + iframe */
+@media (max-width: 1000px) {
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .home-hero {
+    grid-template-columns: 1fr;
+    padding: 0 30px;
+    gap: 20px;
+    min-height: 400px;
+  }
+  .home-text {
+    padding-left: 30px;
+  }
+  .home-text h2 {
+    font-size: 2.5em;
+  }
+  .home-image {
+    max-width: 400px;
+    justify-content: center;
+  }
+  .chess-preview {
+    max-width: 400px;
+  }
+  .play-button {
+    font-size: 1.5em;
+    padding: 12px 30px;
+    margin-top: 15px;
+  }
+  .logo-img {
+    height: 50px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    height: 100px;
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .nav-links a {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+  .content {
+    padding-top: 100px;
+  }
+  .home-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 0 20px;
+    gap: 15px;
+    min-height: 300px;
+  }
+  .home-text {
+    padding-left: 10px;
+  }
+  .home-text h2 {
+    font-size: 2em;
+  }
+  .home-image {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
+  }
+  .chess-preview {
+    max-width: 300px;
+  }
+  .play-button {
+    font-size: 1.2em;
+    padding: 10px 25px;
+    margin-top: 10px;
+  }
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  .feature-card {
+    padding: 15px;
+  }
+  #chessboard {
+    width: 360px !important;
+    height: 360px !important;
+    grid-template-columns: repeat(8, 45px) !important;
+    grid-template-rows: repeat(8, 45px) !important;
+  }
+  .square {
+    width: 45px !important;
+    height: 45px !important;
+  }
+  .square img {
+    width: 42px !important;
+    height: 42px !important;
+  }
+  .logo-img {
+    height: 30px;
+  }
+  /* Sync: Height iframe cho mobile */
+  #mode-iframe {
+    height: 500px !important;
+  }
 }

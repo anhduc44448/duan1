@@ -2,6 +2,7 @@
 import random
 
 piece_score = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
+#Đánh giá mức độ quan trọng của từng quân cờ (VD: 0 là không thể để mất,Q là quan trọng nhất và chỉ mang tính tương đối)
 
 knight_scores = [[0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0],
                  [0.1, 0.3, 0.5, 0.5, 0.5, 0.5, 0.3, 0.1],
@@ -127,4 +128,4 @@ def findRandomMove(valid_moves):
     """
     Picks and returns a random valid move.
     """
-    return random.choice(valid_moves);
+    return random.choice(valid_moves)

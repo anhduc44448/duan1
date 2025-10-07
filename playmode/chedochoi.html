@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chọn Chế Độ Chơi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Path sync: Load CSS từ playmode/ -->
+    <link rel="stylesheet" href="./chedochoi.css">
+</head>
+
+<body>
+    <div class="mode-wrapper">
+        <h2 class="mode-title">Chọn Chế Độ Chơi</h2>
+        <p class="mode-subtitle">Chọn bên trái để đấu với người, bên phải để đấu với AI.</p>
+
+        <div class="mode-layout">
+            <!-- Sync: Left card multi -->
+            <div class="mode-card left-mode" data-mode="multi" onclick="selectMode('multi')">
+                <div class="mode-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Đánh với Người</h3>
+                <p>Tham gia phòng qua Room ID, đấu realtime với bạn bè toàn cầu.</p>
+                <div class="mode-badge">Multiplayer</div>
+            </div>
+
+            <!-- Sync: Right card AI -->
+            <div class="mode-card right-mode" data-mode="ai" onclick="selectMode('ai')">
+                <div class="mode-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Đánh với Máy</h3>
+                <p>Thử thách AI thông minh, luyện tập chiến lược một mình.</p>
+                <div class="mode-badge">AI Challenge</div>
+            </div>
+        </div>
+
+        <button class="back-button" onclick="goBackToHome()">
+            <i class="fas fa-arrow-left"></i> Quay Lại
+        </button>
+    </div>
+    <!-- Path sync: Load JS từ playmode/ -->
+    <script src="./chedochoi.js"></script>
+</body>
+
+</html>

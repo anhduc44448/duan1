@@ -1,0 +1,209 @@
+/* Sync: Base match main body (transparent cho iframe) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background: transparent;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.mode-wrapper {
+  width: 100%;
+  max-width: 800px;
+  padding: 20px;
+  text-align: center;
+  background: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* Sync: Match section background main */
+  border-radius: 15px;
+  margin: 10px;
+}
+
+/* Sync: Title/subtitle match main colors */
+.mode-title {
+  font-size: 2.5em;
+  color: #ff69b4;
+  margin-bottom: 10px;
+  animation: fadeIn 1s ease-in; /* Sync animation main */
+}
+
+.mode-subtitle {
+  font-size: 1.1em;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* Sync: Layout side-by-side flex */
+.mode-layout {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: stretch;
+  margin-bottom: 40px;
+}
+
+.mode-card {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.9); /* Sync: White semi-transparent */
+  border-radius: 15px;
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sync shadow main */
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.mode-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(255, 105, 180, 0.2); /* Sync hồng hover */
+  border-color: #ff69b4;
+}
+
+.mode-card.active {
+  border-color: #ff69b4;
+  background: rgba(255, 182, 193, 0.2);
+}
+
+/* Sync: Accent bars cho left/right */
+.left-mode::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #ff69b4;
+  border-radius: 15px 0 0 15px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.right-mode::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #ff1493;
+  border-radius: 0 15px 15px 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.mode-card:hover::before,
+.mode-card:hover::after {
+  opacity: 1;
+}
+
+.mode-icon {
+  margin-bottom: 20px;
+}
+
+.mode-icon i {
+  font-size: 3em;
+  color: #ff69b4; /* Sync icon color main */
+  transition: color 0.3s ease;
+}
+
+.mode-card:hover .mode-icon i {
+  color: #ff1493;
+}
+
+.mode-card h3 {
+  font-size: 1.5em;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.mode-card p {
+  font-size: 1em;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.mode-badge {
+  background: #ff69b4;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: bold;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.mode-card:hover .mode-badge {
+  background: #ff1493;
+}
+
+.back-button {
+  background: #ff69b4; /* Sync button style main */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  margin-top: 10px;
+}
+
+.back-button:hover {
+  background: #ff1493;
+  transform: translateY(-2px);
+}
+
+/* Sync: Animation từ main */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sync: Responsive match main */
+@media (max-width: 700px) {
+  .mode-layout {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .mode-card {
+    padding: 25px 15px;
+  }
+
+  .mode-title {
+    font-size: 2em;
+  }
+
+  .mode-subtitle {
+    font-size: 1em;
+    margin-bottom: 30px;
+  }
+
+  .mode-icon i {
+    font-size: 2.5em;
+  }
+
+  .mode-wrapper {
+    padding: 10px;
+    margin: 5px;
+  }
+}
