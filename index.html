@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realtime Chess AI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <!-- Path sync: Load main CSS từ static/ -->
     <link rel="stylesheet" href="./static/style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -14,7 +14,10 @@
 <body>
     <div class="header">
         <div class="logo">
-            <img src="./static/images/logo.png" alt="Logo" class="logo-img" onclick="showSection('home-section')">
+            <div class="logo-container">
+                <i class="fas fa-chess-knight logo-icon"></i>
+                <span class="logo-text">Chess Master</span>
+            </div>
         </div>
         <div class="nav-links">
             <a href="#" onclick="showSection('home-section')">Trang Chủ</a>
@@ -23,7 +26,6 @@
             <a href="#" onclick="showSection('login-section')">Đăng Nhập</a>
         </div>
     </div>
-
     <div class="content">
         <!-- Trang chủ -->
         <div id="home-section" class="section">
@@ -63,20 +65,219 @@
 
         <!-- Hướng dẫn chơi -->
         <div id="guide-section" class="section">
-            <h2>Hướng Dẫn Chơi</h2>
-            <p>1. Chọn chế độ: Người hoặc Máy.</p>
-            <p>2. Nhập Room ID để đấu với Người.</p>
-            <p>3. Chọn quân cờ và di chuyển.</p>
-            <p>4. Kết thúc khi chiếu hết hoặc hòa.</p>
-            <button onclick="showSection('home-section')">Quay Lại</button>
+            <div class="guide-container">
+                <div class="guide-header">
+                    <h2><i class="fas fa-graduation-cap"></i> Hướng Dẫn Chơi Cờ Vua</h2>
+                    <p class="guide-subtitle">Làm chủ trò chơi trí tuệ với những bước cơ bản</p>
+                </div>
+
+                <div class="guide-steps">
+                    <!-- Bước 1 -->
+                    <div class="guide-step">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3><i class="fas fa-chess-board"></i> Chọn Chế Độ Chơi</h3>
+                            <div class="step-details">
+                                <div class="mode-option">
+                                    <i class="fas fa-users"></i>
+                                    <div>
+                                        <strong>Đấu với Người</strong>
+                                        <p>Tham gia phòng bằng Room ID để chơi cùng bạn bè</p>
+                                    </div>
+                                </div>
+                                <div class="mode-option">
+                                    <i class="fas fa-robot"></i>
+                                    <div>
+                                        <strong>Đấu với AI</strong>
+                                        <p>Thử thách trí tuệ nhân tạo với nhiều cấp độ</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 2 -->
+                    <div class="guide-step">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3><i class="fas fa-hand-pointer"></i> Cách Di Chuyển Quân Cờ</h3>
+                            <div class="pieces-guide">
+                                <div class="piece-item">
+                                    <img src="./static/images/tottrang.png" alt="Tốt">
+                                    <div>
+                                        <strong>Tốt (Pawn)</strong>
+                                        <p>Đi thẳng 1 ô, ăn chéo. Đi 2 ô nước đầu</p>
+                                    </div>
+                                </div>
+                                <div class="piece-item">
+                                    <img src="./static/images/xetrang.png" alt="Xe">
+                                    <div>
+                                        <strong>Xe (Rook)</strong>
+                                        <p>Đi ngang/dọc không giới hạn ô</p>
+                                    </div>
+                                </div>
+                                <div class="piece-item">
+                                    <img src="./static/images/matrang.png" alt="Mã">
+                                    <div>
+                                        <strong>Mã (Knight)</strong>
+                                        <p>Đi hình chữ L, nhảy qua quân khác</p>
+                                    </div>
+                                </div>
+                                <div class="piece-item">
+                                    <img src="./static/images/tuongtrang.png" alt="Tượng">
+                                    <div>
+                                        <strong>Tượng (Bishop)</strong>
+                                        <p>Đi chéo không giới hạn ô</p>
+                                    </div>
+                                </div>
+                                <div class="piece-item">
+                                    <img src="./static/images/hautrang.png" alt="Hậu">
+                                    <div>
+                                        <strong>Hậu (Queen)</strong>
+                                        <p>Đi ngang/dọc/chéo không giới hạn</p>
+                                    </div>
+                                </div>
+                                <div class="piece-item">
+                                    <img src="./static/images/vuatrang.png" alt="Vua">
+                                    <div>
+                                        <strong>Vua (King)</strong>
+                                        <p>Đi 1 ô mọi hướng. Không thể bị ăn</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 3 -->
+                    <div class="guide-step">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3><i class="fas fa-chess"></i> Luật Chơi Quan Trọng</h3>
+                            <div class="rules-list">
+                                <div class="rule-item">
+                                    <i class="fas fa-flag"></i>
+                                    <div>
+                                        <strong>Chiếu (Check)</strong>
+                                        <p>Vua đang bị tấn công, phải di chuyển hoặc chặn</p>
+                                    </div>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-crown"></i>
+                                    <div>
+                                        <strong>Chiếu hết (Checkmate)</strong>
+                                        <p>Vua bị chiếu và không thể thoát - Kết thúc ván</p>
+                                    </div>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-handshake"></i>
+                                    <div>
+                                        <strong>Hòa (Stalemate)</strong>
+                                        <p>Vua không bị chiếu nhưng không có nước hợp lệ</p>
+                                    </div>
+                                </div>
+                                <div class="rule-item">
+                                    <i class="fas fa-arrows-alt-h"></i>
+                                    <div>
+                                        <strong>Nhập thành (Castling)</strong>
+                                        <p>Vua và Xe di chuyển cùng lúc để bảo vệ Vua</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 4 -->
+                    <div class="guide-step">
+                        <div class="step-number">04</div>
+                        <div class="step-content">
+                            <h3><i class="fas fa-trophy"></i> Chiến Thuật Cơ Bản</h3>
+                            <div class="tactics-grid">
+                                <div class="tactic-card">
+                                    <i class="fas fa-chess-pawn"></i>
+                                    <h4>Kiểm Soát Trung Tâm</h4>
+                                    <p>Đặt quân vào trung tâm bàn cờ để kiểm soát trận đấu</p>
+                                </div>
+                                <div class="tactic-card">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <h4>Bảo Vệ Vua</h4>
+                                    <p>Luôn đảm bảo Vua được an toàn, tốt nhất là nhập thành sớm</p>
+                                </div>
+                                <div class="tactic-card">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <h4>Phát Triển Quân</h4>
+                                    <p>Đưa tất cả quân vào trận, không di chuyển một quân nhiều lần</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="guide-footer">
+                    <button class="start-playing-btn" onclick="showSection('home-section')">
+                        <i class="fas fa-play"></i> Bắt Đầu Chơi Ngay
+                    </button>
+                    <button class="back-home-btn" onclick="showSection('home-section')">
+                        <i class="fas fa-arrow-left"></i> Quay Về Trang Chủ
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Liên hệ -->
         <div id="contact-section" class="section">
-            <h2>Liên Hệ</h2>
-            <p>Email: anhduc4448@gmail.com</p>
-            <p>Số Điện Thoại: 037752261</p>
-            <button onclick="showSection('home-section')">Quay Lại</button>
+            <div class="simple-contact-container">
+                <div class="contact-header">
+                    <h2><i class="fas fa-phone-alt"></i> Liên Hệ</h2>
+                    <p class="contact-subtitle">Cần hỗ trợ? Liên hệ ngay với chúng tôi</p>
+                </div>
+
+                <div class="contact-grid">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h3>Email</h3>
+                            <p>anhduc4448@gmail.com</p>
+                            <a href="mailto:anhduc4448@gmail.com" class="contact-btn">
+                                <i class="fas fa-paper-plane"></i> Gửi Email
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h3>Điện Thoại</h3>
+                            <p>0377.522.261</p>
+                            <a href="tel:+84377522261" class="contact-btn">
+                                <i class="fas fa-phone"></i> Gọi Ngay
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-info">
+                            <h3>Địa Chỉ</h3>
+                            <p>157 Phạm Như Xương, Hòa Khánh,Đà Nẵng, Việt Nam</p>
+                            <span class="contact-status">
+                                <i class="fas fa-circle online"></i> Online 24/7
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-footer">
+                    <button class="back-btn" onclick="showSection('home-section')">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Section chọn mode: Iframe load từ playmode/chedochoi.html -->
