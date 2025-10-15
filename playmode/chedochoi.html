@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chọn Chế Độ Chơi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Path sync: Load CSS từ playmode/ -->
     <link rel="stylesheet" href="./chedochoi.css">
 </head>
 
@@ -16,7 +15,7 @@
         <p class="mode-subtitle">Chọn bên trái để đấu với người, bên phải để đấu với AI.</p>
 
         <div class="mode-layout">
-            <!-- Sync: Left card multi -->
+            <!-- Chế độ Multiplayer -->
             <div class="mode-card left-mode" data-mode="multi" onclick="selectMode('multi')">
                 <div class="mode-icon">
                     <i class="fas fa-users"></i>
@@ -26,22 +25,55 @@
                 <div class="mode-badge">Multiplayer</div>
             </div>
 
-            <!-- Sync: Right card AI -->
+            <!-- Chế độ AI -->
             <div class="mode-card right-mode" data-mode="ai" onclick="selectMode('ai')">
                 <div class="mode-icon">
                     <i class="fas fa-robot"></i>
                 </div>
                 <h3>Đánh với Máy</h3>
-                <p>Thử thách AI thông minh, luyện tập chiến lược một mình.</p>
+                <p>Thử thách AI thông minh, luyện tập chiến thuật một mình.</p>
                 <div class="mode-badge">AI Challenge</div>
             </div>
         </div>
 
+        <!-- PHẦN MỚI: Chọn cấp độ AI (ẩn ban đầu) -->
+        <div id="ai-level-section" class="ai-level-section" style="display: none;">
+            <h3 class="ai-level-title">🎮 Chọn Cấp Độ AI</h3>
+            <div class="ai-level-grid">
+                <div class="ai-level-card" data-level="1" onclick="selectAILevel(1)">
+                    <div class="level-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h4>Dễ</h4>
+                    <p>Hoàn hảo cho người mới bắt đầu học cờ</p>
+                    <div class="level-badge beginner">🎯 Depth 1</div>
+                </div>
+
+                <div class="ai-level-card" data-level="2" onclick="selectAILevel(2)">
+                    <div class="level-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h4>Trung Bình</h4>
+                    <p>Thách thức vừa phải cho người chơi có kinh nghiệm</p>
+                    <div class="level-badge intermediate">⚡ Depth 2</div>
+                </div>
+
+                <div class="ai-level-card" data-level="3" onclick="selectAILevel(3)">
+                    <div class="level-icon">
+                        <i class="fas fa-chess-queen"></i>
+                    </div>
+                    <h4>Khó</h4>
+                    <p>Đối thủ xứng tầm cho các kỳ thủ</p>
+                    <div class="level-badge expert">🔥 Depth 3</div>
+                </div>
+            </div>
+        </div>
+
         <button class="back-button" onclick="goBackToHome()">
-            <i class="fas fa-arrow-left"></i> Quay Lại
+            <i class="fas fa-arrow-left"></i> Quay Lại Trang Chủ
         </button>
     </div>
-    <!-- Path sync: Load JS từ playmode/ -->
+
     <script src="./chedochoi.js"></script>
 </body>
 

@@ -1,8 +1,6 @@
-
 import random
 
 piece_score = {"K": 0, "Q": 9, "R": 5, "B": 3, "N": 3, "p": 1}
-#Đánh giá mức độ quan trọng của từng quân cờ (VD: 0 là không thể để mất,Q là quan trọng nhất và chỉ mang tính tương đối)
 
 knight_scores = [[0.0, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.0],
                  [0.1, 0.3, 0.5, 0.5, 0.5, 0.5, 0.3, 0.1],
@@ -62,31 +60,47 @@ piece_position_scores = {"wN": knight_scores,
 
 CHECKMATE = 1000
 STALEMATE = 0
-DEPTH = 3
 
+next_move = None
 
-def findBestMove(game_state, valid_moves, return_queue):
+def findBestMove(game_state, valid_moves, depth_level=2):
+    """
+    Tìm nước đi tốt nhất với độ sâu có thể điều chỉnh
+    """
     global next_move
     next_move = None
     random.shuffle(valid_moves)
-    findMoveNegaMaxAlphaBeta(game_state, valid_moves, DEPTH, -CHECKMATE, CHECKMATE,
-                             1 if game_state.white_to_move else -1)
-    return_queue.put(next_move)
+    
+    depth = depth_level
+    
+    # THÊM: Debug lượt chơi
+    current_player = "Trắng" if game_state.white_to_move else "Đen"
+    print(f"   AI đang tính cho {current_player} với depth {depth}")
+    
+    findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, -CHECKMATE, CHECKMATE,
+                             1 if game_state.white_to_move else -1, depth)
+    
+    if next_move:
+        print(f"   AI chọn: {next_move}")
+    else:
+        print(f"   AI không tìm thấy nước đi, chọn ngẫu nhiên")
+        next_move = random.choice(valid_moves) if valid_moves else None
+        
+    return next_move
 
-
-def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier, original_depth):
     global next_move
     if depth == 0:
         return turn_multiplier * scoreBoard(game_state)
-    # move ordering - implement later //TODO
+    
     max_score = -CHECKMATE
     for move in valid_moves:
         game_state.makeMove(move)
         next_moves = game_state.getValidMoves()
-        score = -findMoveNegaMaxAlphaBeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
+        score = -findMoveNegaMaxAlphaBeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier, original_depth)
         if score > max_score:
             max_score = score
-            if depth == DEPTH:
+            if depth == original_depth:
                 next_move = move
         game_state.undoMove()
         if max_score > alpha:
@@ -94,7 +108,6 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
         if alpha >= beta:
             break
     return max_score
-
 
 def scoreBoard(game_state):
     """
@@ -106,9 +119,9 @@ def scoreBoard(game_state):
         else:
             return CHECKMATE  # white wins
     elif game_state.stalemate:
-        return STALEMATE #Hòa
-    #Chưa hiểu tạo score làm gì
-    score = 0 #Nếu không có tình huống checkmate hay stalemate thì khởi tạo score
+        return STALEMATE
+    
+    score = 0
     for row in range(len(game_state.board)):
         for col in range(len(game_state.board[row])):
             piece = game_state.board[row][col]
@@ -122,7 +135,6 @@ def scoreBoard(game_state):
                     score -= piece_score[piece[1]] + piece_position_score
 
     return score
-
 
 def findRandomMove(valid_moves):
     """

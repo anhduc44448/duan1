@@ -4,6 +4,7 @@
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   background: transparent;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -17,37 +18,40 @@ body {
 
 .mode-wrapper {
   width: 100%;
-  max-width: 800px;
-  padding: 20px;
+  max-width: 1000px;
+  padding: 30px;
   text-align: center;
-  background: rgba(
-    255,
-    255,
-    255,
-    0.9
-  ); /* Sync: Match section background main */
-  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
   margin: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
-/* Sync: Title/subtitle match main colors */
+/* Tiêu đề */
 .mode-title {
-  font-size: 2.5em;
+  font-size: 2.8em;
   color: #ff69b4;
-  margin-bottom: 10px;
-  animation: fadeIn 1s ease-in; /* Sync animation main */
+  margin-bottom: 15px;
+  animation: fadeIn 1s ease-in;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .mode-subtitle {
-  font-size: 1.1em;
+  font-size: 1.2em;
   color: #666;
   margin-bottom: 40px;
+  font-weight: 300;
 }
 
-/* Sync: Layout side-by-side flex */
+/* Layout chính */
 .mode-layout {
   display: flex;
-  gap: 20px;
+  gap: 25px;
   justify-content: center;
   align-items: stretch;
   margin-bottom: 40px;
@@ -55,38 +59,60 @@ body {
 
 .mode-card {
   flex: 1;
-  background: rgba(255, 255, 255, 0.9); /* Sync: White semi-transparent */
-  border-radius: 15px;
-  padding: 30px 20px;
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border-radius: 20px;
+  padding: 35px 25px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sync shadow main */
-  border: 2px solid transparent;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 3px solid transparent;
   position: relative;
+  overflow: hidden;
+}
+
+.mode-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.mode-card:hover::before {
+  left: 100%;
 }
 
 .mode-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(255, 105, 180, 0.2); /* Sync hồng hover */
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
   border-color: #ff69b4;
 }
 
 .mode-card.active {
   border-color: #ff69b4;
-  background: rgba(255, 182, 193, 0.2);
+  background: linear-gradient(135deg, #fff5f7, #ffeef2);
+  transform: scale(1.02);
 }
 
-/* Sync: Accent bars cho left/right */
+/* Accent bars */
 .left-mode::before {
   content: "";
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
-  width: 5px;
-  background: #ff69b4;
-  border-radius: 15px 0 0 15px;
+  width: 6px;
+  background: linear-gradient(180deg, #ff69b4, #ff1493);
+  border-radius: 20px 0 0 20px;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -97,9 +123,9 @@ body {
   right: 0;
   top: 0;
   bottom: 0;
-  width: 5px;
-  background: #ff1493;
-  border-radius: 0 15px 15px 0;
+  width: 6px;
+  background: linear-gradient(180deg, #ff69b4, #ff1493);
+  border-radius: 0 20px 20px 0;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -110,100 +136,311 @@ body {
 }
 
 .mode-icon {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .mode-icon i {
-  font-size: 3em;
-  color: #ff69b4; /* Sync icon color main */
-  transition: color 0.3s ease;
+  font-size: 4em;
+  color: #ff69b4;
+  transition: all 0.3s ease;
+  text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.3);
 }
 
 .mode-card:hover .mode-icon i {
   color: #ff1493;
+  transform: scale(1.1);
 }
 
 .mode-card h3 {
-  font-size: 1.5em;
+  font-size: 1.8em;
   color: #333;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  font-weight: 600;
 }
 
 .mode-card p {
-  font-size: 1em;
+  font-size: 1.1em;
   color: #666;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  line-height: 1.6;
+  margin-bottom: 25px;
 }
 
 .mode-badge {
-  background: #ff69b4;
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
   color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 1em;
+  font-weight: bold;
+  display: inline-block;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+}
+
+.mode-card:hover .mode-badge {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+}
+
+/* PHẦN MỚI: Cấp độ AI - Thiết kế đẹp */
+.ai-level-section {
+  margin: 40px 0;
+  padding: 35px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(248, 249, 250, 0.9)
+  );
+  border-radius: 20px;
+  border: 2px solid rgba(255, 105, 180, 0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-level-title {
+  font-size: 2.2em;
+  color: #ff69b4;
+  margin-bottom: 30px;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ai-level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.ai-level-card {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  padding: 30px 20px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 3px solid transparent;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-level-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ai-level-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.ai-level-card.active {
+  border-color: #ff69b4;
+  background: linear-gradient(135deg, #fff5f7, #ffeef2);
+  transform: scale(1.03);
+}
+
+.ai-level-card.active::before {
+  opacity: 1;
+}
+
+.level-icon {
+  margin-bottom: 20px;
+}
+
+.level-icon i {
+  font-size: 3.5em;
+  transition: all 0.3s ease;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Màu sắc cho từng cấp độ */
+.ai-level-card[data-level="1"] .level-icon i {
+  color: #4caf50;
+  background: linear-gradient(45deg, #4caf50, #66bb6a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ai-level-card[data-level="2"] .level-icon i {
+  color: #2196f3;
+  background: linear-gradient(45deg, #2196f3, #42a5f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ai-level-card[data-level="3"] .level-icon i {
+  color: #ff9800;
+  background: linear-gradient(45deg, #ff9800, #ffb74d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ai-level-card:hover .level-icon i {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.ai-level-card h4 {
+  font-size: 1.5em;
+  color: #333;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.ai-level-card p {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.level-badge {
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9em;
   font-weight: bold;
+  color: white;
   display: inline-block;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 
-.mode-card:hover .mode-badge {
-  background: #ff1493;
+.beginner {
+  background: linear-gradient(45deg, #4caf50, #66bb6a);
+}
+.intermediate {
+  background: linear-gradient(45deg, #2196f3, #42a5f5);
+}
+.expert {
+  background: linear-gradient(45deg, #ff9800, #ffb74d);
 }
 
+.ai-level-card:hover .level-badge {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Nút quay lại */
 .back-button {
-  background: #ff69b4; /* Sync button style main */
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 12px 25px;
-  font-size: 1em;
+  border-radius: 15px;
+  padding: 15px 35px;
+  font-size: 1.1em;
   cursor: pointer;
-  transition: background 0.3s, transform 0.3s;
-  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.3);
+  margin-top: 20px;
+  font-weight: 600;
 }
 
 .back-button:hover {
-  background: #ff1493;
-  transform: translateY(-2px);
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
 }
 
-/* Sync: Animation từ main */
+.back-button:active {
+  transform: translateY(-1px);
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* Sync: Responsive match main */
-@media (max-width: 700px) {
+/* Responsive */
+@media (max-width: 768px) {
+  .mode-wrapper {
+    padding: 20px;
+    margin: 5px;
+  }
+
   .mode-layout {
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
   }
 
   .mode-card {
-    padding: 25px 15px;
+    padding: 25px 20px;
   }
 
   .mode-title {
-    font-size: 2em;
+    font-size: 2.2em;
   }
 
   .mode-subtitle {
-    font-size: 1em;
+    font-size: 1.1em;
     margin-bottom: 30px;
   }
 
   .mode-icon i {
-    font-size: 2.5em;
+    font-size: 3em;
   }
 
-  .mode-wrapper {
-    padding: 10px;
-    margin: 5px;
+  .ai-level-section {
+    padding: 25px 20px;
+    margin: 30px 0;
+  }
+
+  .ai-level-title {
+    font-size: 1.8em;
+  }
+
+  .ai-level-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .ai-level-card {
+    padding: 25px 15px;
+  }
+
+  .back-button {
+    padding: 12px 30px;
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .mode-title {
+    font-size: 1.8em;
+  }
+
+  .mode-subtitle {
+    font-size: 1em;
+  }
+
+  .ai-level-title {
+    font-size: 1.5em;
+  }
+
+  .level-icon i {
+    font-size: 2.8em;
   }
 }
