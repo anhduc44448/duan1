@@ -1,86 +1,102 @@
-// Sync: Functions gửi message về main script.js
-let selectedAIMode = null;
-let selectedAILevel = null;
+// Biến toàn cục
+let selectedMode = null;
+let selectedAILevel = 2; // Mặc định Trung bình
+let roomId = "";
 
 function selectMode(mode) {
-  console.log("Selecting mode in playmode:", mode);
+  console.log("Selecting mode:", mode);
 
-  // Local feedback (active class)
-  document
-    .querySelectorAll(".mode-card")
-    .forEach((card) => card.classList.remove("active"));
-  const selectedCard = document.querySelector(`[data-mode="${mode}"]`);
-  if (selectedCard) selectedCard.classList.add("active");
+  // Cập nhật giao diện
+  document.querySelectorAll(".mode-card").forEach((card) => {
+    card.classList.remove("active");
+  });
+  document.querySelector(`[data-mode="${mode}"]`).classList.add("active");
 
-  if (mode === "ai") {
-    // HIỂN THỊ phần chọn cấp độ AI với hiệu ứng
-    const aiSection = document.getElementById("ai-level-section");
-    aiSection.style.display = "block";
-    aiSection.style.animation = "slideDown 0.6s ease-out";
+  selectedMode = mode;
 
-    selectedAIMode = "ai";
+  // Hiển thị phần cấu hình
+  const configSection = document.getElementById("game-config-section");
+  configSection.style.display = "block";
+  configSection.style.animation = "slideDown 0.6s ease-out";
 
-    // Cuộn xuống phần chọn cấp độ
-    setTimeout(() => {
-      aiSection.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300);
-  } else {
-    // ẨN phần chọn cấp độ AI nếu chọn multiplayer
-    document.getElementById("ai-level-section").style.display = "none";
-    selectedAILevel = null;
+  // Hiển thị/ẩn phần cấp độ AI
+  const aiLevelSection = document.querySelector(".ai-only");
+  aiLevelSection.style.display = mode === "ai" ? "block" : "none";
 
-    // Sync: Gửi message về parent
-    window.parent.postMessage(
-      {
-        type: "MODE_SELECTED",
-        mode: mode,
-        aiLevel: null,
-      },
-      "*"
-    );
-  }
+  // Cập nhật thông tin phòng
+  updateRoomInfo();
 
-  console.log("Sent MODE_SELECTED to main");
+  // Cuộn xuống phần cấu hình
+  setTimeout(() => {
+    configSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 300);
 }
 
 function selectAILevel(level) {
   console.log("Selecting AI level:", level);
 
-  // Local feedback (active class với hiệu ứng)
-  document.querySelectorAll(".ai-level-card").forEach((card) => {
-    card.classList.remove("active");
-    card.style.transform = "scale(1)";
+  // Cập nhật giao diện
+  document.querySelectorAll(".level-btn").forEach((btn) => {
+    btn.classList.remove("active");
   });
-
-  const selectedCard = document.querySelector(`[data-level="${level}"]`);
-  if (selectedCard) {
-    selectedCard.classList.add("active");
-    selectedCard.style.transform = "scale(1.05)";
-  }
+  document.querySelector(`[data-level="${level}"]`).classList.add("active");
 
   selectedAILevel = level;
+  updateRoomInfo();
+}
 
-  // Hiệu ứng xác nhận
-  if (selectedCard) {
-    selectedCard.style.animation = "pulse 0.6s ease-in-out";
-    setTimeout(() => {
-      selectedCard.style.animation = "";
-    }, 600);
+function updateRoomInfo() {
+  const roomInput = document.getElementById("roomInput");
+  roomId = roomInput.value.trim();
+
+  const roomInfo = document.getElementById("roomInfo");
+
+  if (selectedMode === "ai") {
+    const levelNames = { 1: "Dễ", 2: "Trung Bình", 3: "Khó" };
+    roomInfo.innerHTML = `Chế độ: AI (${levelNames[selectedAILevel]}) | Người chơi: Trắng`;
+  } else {
+    const roomDisplay = roomId ? roomId : "Tạo phòng mới";
+    roomInfo.innerHTML = `Chế độ: Multiplayer | Phòng: ${roomDisplay} | Người chơi: Trắng`;
+  }
+}
+
+function generateRoomId() {
+  return Math.random().toString(36).substring(2, 10).toUpperCase();
+}
+
+function startGame() {
+  const roomInput = document.getElementById("roomInput");
+  let finalRoomId = roomInput.value.trim();
+
+  // Tạo Room ID nếu để trống
+  if (!finalRoomId) {
+    finalRoomId = generateRoomId();
+    roomInput.value = finalRoomId;
   }
 
-  // Tự động gửi sau khi chọn level (hoặc có thể thêm nút "Bắt đầu")
-  setTimeout(() => {
-    window.parent.postMessage(
-      {
-        type: "MODE_SELECTED",
-        mode: "ai",
-        aiLevel: level,
-      },
-      "*"
-    );
-  }, 800); // Delay để người dùng thấy hiệu ứng
+  console.log("Starting game with config:", {
+    mode: selectedMode,
+    roomId: finalRoomId,
+    aiLevel: selectedAILevel,
+  });
 
-  console.log("Sent AI_LEVEL_SELECTED to main - Level:", level);
+  if (!selectedMode) {
+    alert("Vui lòng chọn chế độ chơi!");
+    return;
+  }
+
+  // Gửi thông tin về main app
+  window.parent.postMessage(
+    {
+      type: "GAME_START",
+      mode: selectedMode,
+      roomId: finalRoomId,
+      aiLevel: selectedMode === "ai" ? selectedAILevel : null,
+    },
+    "*"
+  );
+
+  console.log("Sent GAME_START to main app");
 }
 
 function goBackToHome() {
@@ -96,29 +112,37 @@ function goBackToHome() {
       "*"
     );
   }, 300);
-
-  console.log("Sent GO_BACK to main");
 }
 
-// THÊM: Hiệu ứng pulse cho CSS
-const style = document.createElement("style");
-style.textContent = `
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-    100% { transform: scale(1.05); }
-  }
-  @keyframes fadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-20px); }
-  }
-`;
-document.head.appendChild(style);
+// Lắng nghe sự kiện input Room ID
+document.addEventListener("DOMContentLoaded", function () {
+  const roomInput = document.getElementById("roomInput");
 
-// Sync: Init khi load iframe
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("playmode/chedochoi loaded - ready for sync");
+  roomInput.addEventListener("input", function () {
+    updateRoomInfo();
+  });
+
+  roomInput.addEventListener("focus", function () {
+    if (!this.value) {
+      this.value = generateRoomId();
+      updateRoomInfo();
+    }
+  });
+
+  // Khởi tạo mặc định
+  document.querySelector('[data-level="2"]').classList.add("active");
+
   // Hiệu ứng khi load
   document.querySelector(".mode-wrapper").style.animation =
     "fadeIn 0.8s ease-out";
 });
+
+// Thêm CSS animations
+const style = document.createElement("style");
+style.textContent = `
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+`;
+document.head.appendChild(style);

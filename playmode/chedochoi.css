@@ -1,4 +1,4 @@
-/* Sync: Base match main body (transparent cho iframe) */
+/* Base styles */
 * {
   margin: 0;
   padding: 0;
@@ -18,14 +18,15 @@ body {
 
 .mode-wrapper {
   width: 100%;
-  max-width: 1000px;
-  padding: 30px;
+  max-width: 900px;
+  padding: 40px 30px;
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
-  margin: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Tiêu đề */
@@ -39,33 +40,33 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-weight: 700;
 }
 
 .mode-subtitle {
-  font-size: 1.2em;
+  font-size: 1.3em;
   color: #666;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
   font-weight: 300;
+  line-height: 1.5;
 }
 
 /* Layout chính */
 .mode-layout {
-  display: flex;
-  gap: 25px;
-  justify-content: center;
-  align-items: stretch;
-  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
 }
 
 .mode-card {
-  flex: 1;
   background: linear-gradient(135deg, #ffffff, #f8f9fa);
   border-radius: 20px;
-  padding: 35px 25px;
+  padding: 40px 30px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.4s ease;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border: 3px solid transparent;
   position: relative;
   overflow: hidden;
@@ -81,10 +82,10 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.6),
     transparent
   );
-  transition: left 0.6s;
+  transition: left 0.8s;
 }
 
 .mode-card:hover::before {
@@ -92,63 +93,51 @@ body {
 }
 
 .mode-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 20px 40px rgba(255, 105, 180, 0.25);
   border-color: #ff69b4;
 }
 
 .mode-card.active {
   border-color: #ff69b4;
   background: linear-gradient(135deg, #fff5f7, #ffeef2);
-  transform: scale(1.02);
+  transform: scale(1.03);
+  box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
 }
 
 /* Accent bars */
-.left-mode::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: linear-gradient(180deg, #ff69b4, #ff1493);
-  border-radius: 20px 0 0 20px;
-  opacity: 0;
-  transition: opacity 0.3s;
+.left-mode {
+  border-left: 6px solid transparent;
+  transition: border-left-color 0.3s ease;
 }
 
-.right-mode::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: linear-gradient(180deg, #ff69b4, #ff1493);
-  border-radius: 0 20px 20px 0;
-  opacity: 0;
-  transition: opacity 0.3s;
+.left-mode:hover {
+  border-left-color: #ff69b4;
 }
 
-.mode-card:hover::before,
-.mode-card:hover::after {
-  opacity: 1;
+.right-mode {
+  border-right: 6px solid transparent;
+  transition: border-right-color 0.3s ease;
+}
+
+.right-mode:hover {
+  border-right-color: #ff69b4;
 }
 
 .mode-icon {
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 
 .mode-icon i {
-  font-size: 4em;
+  font-size: 5em;
   color: #ff69b4;
-  transition: all 0.3s ease;
-  text-shadow: 2px 2px 8px rgba(255, 105, 180, 0.3);
+  transition: all 0.4s ease;
+  text-shadow: 3px 3px 10px rgba(255, 105, 180, 0.3);
 }
 
 .mode-card:hover .mode-icon i {
   color: #ff1493;
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
 }
 
 .mode-card h3 {
@@ -156,6 +145,7 @@ body {
   color: #333;
   margin-bottom: 20px;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .mode-card p {
@@ -168,205 +158,265 @@ body {
 .mode-badge {
   background: linear-gradient(45deg, #ff69b4, #ff1493);
   color: white;
-  padding: 10px 20px;
+  padding: 12px 25px;
   border-radius: 25px;
   font-size: 1em;
-  font-weight: bold;
+  font-weight: 600;
   display: inline-block;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+  box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .mode-card:hover .mode-badge {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4);
 }
 
-/* PHẦN MỚI: Cấp độ AI - Thiết kế đẹp */
-.ai-level-section {
+/* Phần cấu hình */
+.game-config-section {
   margin: 40px 0;
-  padding: 35px;
+  padding: 40px;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.9),
-    rgba(248, 249, 250, 0.9)
+    rgba(255, 255, 255, 0.95),
+    rgba(248, 249, 250, 0.95)
   );
   border-radius: 20px;
-  border: 2px solid rgba(255, 105, 180, 0.2);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(255, 105, 180, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   animation: slideDown 0.6s ease-out;
+  backdrop-filter: blur(10px);
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ai-level-title {
-  font-size: 2.2em;
+.config-title {
+  font-size: 2em;
   color: #ff69b4;
   margin-bottom: 30px;
   font-weight: 600;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.ai-level-grid {
+.config-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: 1fr;
   gap: 25px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
-.ai-level-card {
-  background: linear-gradient(135deg, #ffffff, #f8f9fa);
-  padding: 30px 20px;
-  border-radius: 18px;
-  cursor: pointer;
-  transition: all 0.4s ease;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  border: 3px solid transparent;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.config-item {
+  text-align: left;
 }
 
-.ai-level-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.ai-level-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-}
-
-.ai-level-card.active {
-  border-color: #ff69b4;
-  background: linear-gradient(135deg, #fff5f7, #ffeef2);
-  transform: scale(1.03);
-}
-
-.ai-level-card.active::before {
-  opacity: 1;
-}
-
-.level-icon {
-  margin-bottom: 20px;
-}
-
-.level-icon i {
-  font-size: 3.5em;
-  transition: all 0.3s ease;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Màu sắc cho từng cấp độ */
-.ai-level-card[data-level="1"] .level-icon i {
-  color: #4caf50;
-  background: linear-gradient(45deg, #4caf50, #66bb6a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.ai-level-card[data-level="2"] .level-icon i {
-  color: #2196f3;
-  background: linear-gradient(45deg, #2196f3, #42a5f5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.ai-level-card[data-level="3"] .level-icon i {
-  color: #ff9800;
-  background: linear-gradient(45deg, #ff9800, #ffb74d);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.ai-level-card:hover .level-icon i {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.ai-level-card h4 {
-  font-size: 1.5em;
+.config-item label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
   color: #333;
   margin-bottom: 12px;
-  font-weight: 600;
+  font-size: 1.15em;
 }
 
-.ai-level-card p {
+.config-item label i {
+  color: #ff69b4;
+  font-size: 1.1em;
+}
+
+.config-item input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   font-size: 1em;
-  color: #666;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.level-badge {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.9em;
-  font-weight: bold;
-  color: white;
-  display: inline-block;
   transition: all 0.3s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
 }
 
-.beginner {
-  background: linear-gradient(45deg, #4caf50, #66bb6a);
-}
-.intermediate {
-  background: linear-gradient(45deg, #2196f3, #42a5f5);
-}
-.expert {
-  background: linear-gradient(45deg, #ff9800, #ffb74d);
+.config-item input:focus {
+  border-color: #ff69b4;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+  background: white;
 }
 
-.ai-level-card:hover .level-badge {
+.config-item small {
+  color: #888;
+  font-size: 0.9em;
+  margin-top: 8px;
+  display: block;
+  line-height: 1.4;
+}
+
+/* Nút cấp độ AI */
+.ai-level-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.level-btn {
+  padding: 15px 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.level-btn:hover {
+  border-color: #ff69b4;
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Nút quay lại */
-.back-button {
+.level-btn.active {
+  border-color: #ff69b4;
+  background: linear-gradient(135deg, #fff5f7, #ffeef2);
+  color: #ff69b4;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+}
+
+/* Màu sắc cho các cấp độ */
+.level-btn[data-level="1"] {
+  color: #4caf50;
+}
+.level-btn[data-level="2"] {
+  color: #2196f3;
+}
+.level-btn[data-level="3"] {
+  color: #ff9800;
+}
+
+.level-btn[data-level="1"]:hover {
+  border-color: #4caf50;
+}
+.level-btn[data-level="2"]:hover {
+  border-color: #2196f3;
+}
+.level-btn[data-level="3"]:hover {
+  border-color: #ff9800;
+}
+
+.level-btn[data-level="1"].active {
+  border-color: #4caf50;
+  background: linear-gradient(135deg, #f1f8e9, #e8f5e8);
+  color: #4caf50;
+}
+.level-btn[data-level="2"].active {
+  border-color: #2196f3;
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
+  color: #2196f3;
+}
+.level-btn[data-level="3"].active {
+  border-color: #ff9800;
+  background: linear-gradient(135deg, #fff3e0, #fff8e1);
+  color: #ff9800;
+}
+
+/* Thông tin phòng */
+.room-info {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(255, 105, 180, 0.1);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 1.05em;
+}
+
+.info-item:last-child {
+  margin-bottom: 0;
+}
+
+.info-item i {
+  color: #ff69b4;
+  width: 20px;
+  font-size: 1.1em;
+}
+
+.info-item strong {
+  color: #333;
+}
+
+/* Nút hành động */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-btn {
   background: linear-gradient(45deg, #ff69b4, #ff1493);
   color: white;
   border: none;
   border-radius: 15px;
-  padding: 15px 35px;
-  font-size: 1.1em;
+  padding: 18px 45px;
+  font-size: 1.2em;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.3);
-  margin-top: 20px;
+  box-shadow: 0 8px 25px rgba(255, 105, 180, 0.3);
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
 }
 
-.back-button:hover {
-  background: linear-gradient(45deg, #ff1493, #ff69b4);
+.start-btn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
+  box-shadow: 0 12px 30px rgba(255, 105, 180, 0.4);
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
 }
 
-.back-button:active {
+.start-btn:active {
   transform: translateY(-1px);
+}
+
+.back-btn {
+  background: transparent;
+  color: #666;
+  border: 2px solid #ddd;
+  border-radius: 15px;
+  padding: 18px 35px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+}
+
+.back-btn:hover {
+  background: #f8f9fa;
+  color: #333;
+  border-color: #ccc;
+  transform: translateY(-2px);
 }
 
 /* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -374,20 +424,43 @@ body {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .mode-wrapper {
-    padding: 20px;
-    margin: 5px;
+    padding: 30px 20px;
+    margin: 15px;
   }
 
   .mode-layout {
-    flex-direction: column;
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 25px;
   }
 
   .mode-card {
-    padding: 25px 20px;
+    padding: 30px 25px;
   }
 
   .mode-title {
@@ -396,51 +469,101 @@ body {
 
   .mode-subtitle {
     font-size: 1.1em;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
 
   .mode-icon i {
-    font-size: 3em;
+    font-size: 4em;
   }
 
-  .ai-level-section {
-    padding: 25px 20px;
+  .game-config-section {
+    padding: 30px 25px;
     margin: 30px 0;
   }
 
-  .ai-level-title {
-    font-size: 1.8em;
+  .config-title {
+    font-size: 1.7em;
   }
 
-  .ai-level-grid {
+  .ai-level-buttons {
     grid-template-columns: 1fr;
-    gap: 20px;
   }
 
-  .ai-level-card {
-    padding: 25px 15px;
+  .action-buttons {
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .back-button {
-    padding: 12px 30px;
-    font-size: 1em;
+  .start-btn,
+  .back-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
+  .mode-wrapper {
+    padding: 25px 15px;
+    margin: 10px;
+  }
+
   .mode-title {
     font-size: 1.8em;
   }
 
-  .mode-subtitle {
-    font-size: 1em;
+  .mode-card {
+    padding: 25px 20px;
   }
 
-  .ai-level-title {
+  .mode-card h3 {
     font-size: 1.5em;
   }
 
-  .level-icon i {
-    font-size: 2.8em;
+  .config-title {
+    font-size: 1.5em;
   }
+
+  .game-config-section {
+    padding: 25px 20px;
+  }
+
+  .config-item input {
+    padding: 12px 15px;
+  }
+
+  .level-btn {
+    padding: 12px 15px;
+  }
+
+  .room-info {
+    padding: 20px;
+  }
+
+  .info-item {
+    font-size: 1em;
+  }
+}
+
+/* Hiệu ứng loading */
+.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Scrollbar tùy chỉnh */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
 }

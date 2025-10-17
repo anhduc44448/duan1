@@ -15,7 +15,7 @@ class CustomGameState:
         self.player_color = "white"  # Người chơi luôn là trắng
         self.room = None
         self.ai_level = 2  # Mặc định Trung bình
-        self.ai_color = "black"  # THÊM: AI luôn là đen
+        self.ai_color = "black"  # AI luôn là đen
 
     def make_move(self, from_pos, to_pos):
         move = Move(

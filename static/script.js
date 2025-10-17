@@ -5,6 +5,40 @@ let currentBoard = [];
 let selectedSquare = null;
 let currentRoom = null;
 let currentMode = null;
+let currentAILevel = 2;
+
+// HÀM MỚI: Xử lý bắt đầu game từ cấu hình
+function startGameFromConfig(config) {
+  console.log("Starting game with config:", config);
+
+  currentMode = config.mode;
+  currentRoom = config.roomId;
+  currentAILevel = config.aiLevel || 2;
+
+  // Join room với thông tin đầy đủ
+  socket.emit("join", {
+    room: currentRoom,
+    mode: currentMode,
+    aiLevel: currentAILevel,
+  });
+
+  // Cập nhật status
+  const statusEl = document.getElementById("status");
+  if (statusEl) {
+    if (currentMode === "ai") {
+      const levelNames = ["Dễ", "Trung Bình", "Khó"];
+      statusEl.innerText = `Chế độ AI - Cấp độ: ${
+        levelNames[currentAILevel - 1] || "Trung Bình"
+      }`;
+    } else {
+      statusEl.innerText = `Đã tham gia phòng: ${currentRoom} (Vs Người)`;
+    }
+  }
+
+  // Ẩn iframe và hiện game
+  document.getElementById("mode-iframe").style.display = "none";
+  showGameSection();
+}
 
 // Sync: Show section (dùng cho SPA navigation)
 function showSection(sectionId) {
@@ -34,11 +68,17 @@ function loadModeSection() {
   console.log("Loaded mode iframe from playmode/");
 }
 
+// Sync: Show game section
+function showGameSection() {
+  showSection("game-section");
+}
+
 // Sync: Join room (cho multi)
 function joinRoom() {
   const room = document.getElementById("roomInput").value;
   if (room) {
     currentRoom = room;
+    currentMode = "multi";
     socket.emit("join", { room: currentRoom, mode: "multi" });
     document.getElementById("status").innerText =
       "Đã tham gia phòng: " + currentRoom + " (Vs Người)";
@@ -48,12 +88,7 @@ function joinRoom() {
   }
 }
 
-// Sync: Show game section
-function showGameSection() {
-  showSection("game-section");
-}
-
-// Sync: Select mode (gọi từ message của playmode/chedochoi.js)
+// Sync: Select mode (gọi từ message của playmode/chedochoi.js) - CẬP NHẬT
 function selectMode(mode, aiLevel = null) {
   console.log("Selecting mode from playmode:", mode, "AI Level:", aiLevel);
   currentMode = mode;
@@ -64,7 +99,7 @@ function selectMode(mode, aiLevel = null) {
     socket.emit("join", {
       room: currentRoom,
       mode: "ai",
-      aiLevel: currentAILevel, // THÊM: gửi level AI
+      aiLevel: currentAILevel,
     });
     const statusEl = document.getElementById("status");
     if (statusEl) {
@@ -73,11 +108,9 @@ function selectMode(mode, aiLevel = null) {
         levelNames[currentAILevel - 1] || "Trung Bình"
       }`;
     }
-    // Sync: Ẩn iframe sau sync
     document.getElementById("mode-iframe").style.display = "none";
     showGameSection();
   } else {
-    // Multi
     document.getElementById("mode-iframe").style.display = "none";
     showSection("multi-room-section");
   }
@@ -112,7 +145,7 @@ function drawBoard(board) {
       const piece = board[row][col];
       if (piece !== "--") {
         const img = document.createElement("img");
-        const imgSrc = `./static/images/${pieceMap[piece] || piece}.png`; // Path sync: static/images/
+        const imgSrc = `./static/images/${pieceMap[piece] || piece}.png`;
         img.src = imgSrc;
         img.alt = piece;
         img.onload = () => console.log("Tải ảnh thành công:", imgSrc);
@@ -151,6 +184,12 @@ function handleClick(row, col) {
     }
     const from = selectedSquare;
     const to = { row, col };
+
+    // THÊM: Hiển thị loading nếu là AI
+    if (currentMode === "ai") {
+      document.getElementById("turn").innerText = "Đang xử lý...";
+    }
+
     socket.emit("make_move", { room: currentRoom, from, to });
     selectedSquare = null;
   } else {
@@ -162,17 +201,15 @@ function handleClick(row, col) {
 // Sync: Reset board
 function resetBoard() {
   if (currentRoom) {
-    // Gửi kèm mode hiện tại khi reset
     socket.emit("reset", {
       room: currentRoom,
-      mode: currentMode, // THÊM: gửi mode hiện tại
+      mode: currentMode,
     });
   }
 }
 
 // THÊM: Socket event cho reset
 socket.on("reset", (data) => {
-  // Cập nhật lại UI theo mode
   if (currentMode === "ai") {
     document.getElementById("status").innerText = "Đã reset - Chế độ AI";
   } else {
@@ -208,15 +245,20 @@ socket.on("game_over", (data) => {
   alert(data.msg);
 });
 
-// Sync: Listener message từ iframe playmode/
+// QUAN TRỌNG: CẬP NHẬT message listener để xử lý GAME_START
 window.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "MODE_SELECTED") {
+  console.log("Received message from playmode iframe:", event.data);
+
+  if (event.data && event.data.type === "GAME_START") {
+    // Xử lý message mới - bắt đầu game từ cấu hình
+    startGameFromConfig(event.data);
+  } else if (event.data && event.data.type === "MODE_SELECTED") {
+    // Giữ lại để tương thích ngược
     selectMode(event.data.mode, event.data.aiLevel);
   } else if (event.data && event.data.type === "GO_BACK") {
     showSection("home-section");
     document.getElementById("mode-iframe").style.display = "none";
   }
-  console.log("Received message from playmode iframe:", event.data);
 });
 
 // Sync: Init app
@@ -224,44 +266,9 @@ window.onload = function () {
   showSection("home-section");
 };
 
-// THÊM: Error handling cho kết nối socket (đặt sau const socket = io();)
-socket.on("connect_error", (error) => {
-  console.error("Connection error:", error);
-  alert("Không thể kết nối đến server. Vui lòng thử lại!");
-});
-
 socket.on("disconnect", (reason) => {
   console.log("Disconnected:", reason);
   if (reason === "io server disconnect") {
     socket.connect();
   }
 });
-
-// THÊM: Loading state cho AI (trong hàm handleClick)
-function handleClick(row, col) {
-  if (!currentRoom) {
-    alert("Bạn cần join room trước!");
-    return;
-  }
-
-  if (selectedSquare) {
-    if (selectedSquare.row === row && selectedSquare.col === col) {
-      selectedSquare = null;
-      drawBoard(currentBoard);
-      return;
-    }
-    const from = selectedSquare;
-    const to = { row, col };
-
-    // THÊM: Hiển thị loading nếu là AI
-    if (currentMode === "ai") {
-      document.getElementById("turn").innerText = "Đang xử lý...";
-    }
-
-    socket.emit("make_move", { room: currentRoom, from, to });
-    selectedSquare = null;
-  } else {
-    selectedSquare = { row, col };
-    drawBoard(currentBoard);
-  }
-}

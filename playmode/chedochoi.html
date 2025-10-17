@@ -12,7 +12,7 @@
 <body>
     <div class="mode-wrapper">
         <h2 class="mode-title">Chọn Chế Độ Chơi</h2>
-        <p class="mode-subtitle">Chọn bên trái để đấu với người, bên phải để đấu với AI.</p>
+        <p class="mode-subtitle">Chọn cách bạn muốn chơi cờ</p>
 
         <div class="mode-layout">
             <!-- Chế độ Multiplayer -->
@@ -36,42 +36,61 @@
             </div>
         </div>
 
-        <!-- PHẦN MỚI: Chọn cấp độ AI (ẩn ban đầu) -->
-        <div id="ai-level-section" class="ai-level-section" style="display: none;">
-            <h3 class="ai-level-title">🎮 Chọn Cấp Độ AI</h3>
-            <div class="ai-level-grid">
-                <div class="ai-level-card" data-level="1" onclick="selectAILevel(1)">
-                    <div class="level-icon">
-                        <i class="fas fa-seedling"></i>
-                    </div>
-                    <h4>Dễ</h4>
-                    <p>Hoàn hảo cho người mới bắt đầu học cờ</p>
-                    <div class="level-badge beginner">🎯 Depth 1</div>
+        <!-- Phần cấu hình chung -->
+        <div id="game-config-section" class="game-config-section" style="display: none;">
+            <h3 class="config-title">⚙️ Cấu Hình Trò Chơi</h3>
+
+            <div class="config-grid">
+                <!-- Room ID (dùng cho cả AI và Multi) -->
+                <div class="config-item">
+                    <label for="roomInput">
+                        <i class="fas fa-door-open"></i> Room ID
+                    </label>
+                    <input type="text" id="roomInput" placeholder="Nhập Room ID hoặc để trống để tạo mới">
+                    <small>Tạo Room ID mới hoặc nhập Room ID có sẵn để chơi cùng</small>
                 </div>
 
-                <div class="ai-level-card" data-level="2" onclick="selectAILevel(2)">
-                    <div class="level-icon">
-                        <i class="fas fa-user-graduate"></i>
+                <!-- Cấp độ AI (chỉ hiện khi chọn AI) -->
+                <div class="config-item ai-only" style="display: none;">
+                    <label>
+                        <i class="fas fa-brain"></i> Cấp Độ AI
+                    </label>
+                    <div class="ai-level-buttons">
+                        <button class="level-btn" data-level="1" onclick="selectAILevel(1)">
+                            <i class="fas fa-seedling"></i> Dễ
+                        </button>
+                        <button class="level-btn active" data-level="2" onclick="selectAILevel(2)">
+                            <i class="fas fa-user-graduate"></i> Trung Bình
+                        </button>
+                        <button class="level-btn" data-level="3" onclick="selectAILevel(3)">
+                            <i class="fas fa-chess-queen"></i> Khó
+                        </button>
                     </div>
-                    <h4>Trung Bình</h4>
-                    <p>Thách thức vừa phải cho người chơi có kinh nghiệm</p>
-                    <div class="level-badge intermediate">⚡ Depth 2</div>
-                </div>
-
-                <div class="ai-level-card" data-level="3" onclick="selectAILevel(3)">
-                    <div class="level-icon">
-                        <i class="fas fa-chess-queen"></i>
-                    </div>
-                    <h4>Khó</h4>
-                    <p>Đối thủ xứng tầm cho các kỳ thủ</p>
-                    <div class="level-badge expert">🔥 Depth 3</div>
                 </div>
             </div>
-        </div>
 
-        <button class="back-button" onclick="goBackToHome()">
-            <i class="fas fa-arrow-left"></i> Quay Lại Trang Chủ
-        </button>
+            <!-- Thông tin phòng -->
+            <div class="room-info">
+                <div class="info-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="roomInfo">Chưa có thông tin phòng</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-chess-board"></i>
+                    <span>Màu quân cờ: <strong>Trắng</strong> (Luôn đi trước)</span>
+                </div>
+            </div>
+
+            <!-- Nút bắt đầu -->
+            <div class="action-buttons">
+                <button class="start-btn" onclick="startGame()">
+                    <i class="fas fa-play"></i> Bắt Đầu Chơi
+                </button>
+                <button class="back-btn" onclick="goBackToHome()">
+                    <i class="fas fa-arrow-left"></i> Quay Lại
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="./chedochoi.js"></script>
