@@ -1,6 +1,7 @@
 // Biến toàn cục
 let selectedMode = null;
 let selectedAILevel = 2; // Mặc định Trung bình
+let selectedColor = "white"; // THÊM: Mặc định là trắng
 let roomId = "";
 
 function selectMode(mode) {
@@ -45,6 +46,26 @@ function selectAILevel(level) {
   updateRoomInfo();
 }
 
+// THÊM: Hàm chọn màu
+function selectColor(color) {
+  console.log("Selecting color:", color);
+
+  // Cập nhật giao diện
+  document.querySelectorAll(".color-btn").forEach((btn) => {
+    btn.classList.remove("active");
+  });
+  document.querySelector(`[data-color="${color}"]`).classList.add("active");
+
+  // Xử lý màu ngẫu nhiên
+  if (color === "random") {
+    color = Math.random() > 0.5 ? "white" : "black";
+  }
+
+  selectedColor = color;
+  updateRoomInfo();
+}
+
+// SỬA: Hàm cập nhật thông tin phòng
 function updateRoomInfo() {
   const roomInput = document.getElementById("roomInput");
   roomId = roomInput.value.trim();
@@ -53,10 +74,14 @@ function updateRoomInfo() {
 
   if (selectedMode === "ai") {
     const levelNames = { 1: "Dễ", 2: "Trung Bình", 3: "Khó" };
-    roomInfo.innerHTML = `Chế độ: AI (${levelNames[selectedAILevel]}) | Người chơi: Trắng`;
+    const colorText = selectedColor === "white" ? "Trắng" : "Đen";
+    // SỬA: Thêm thông tin màu và lượt đầu random
+    roomInfo.innerHTML = `Chế độ: AI (${levelNames[selectedAILevel]}) | Người chơi: ${colorText} | Lượt đầu: Random`;
   } else {
     const roomDisplay = roomId ? roomId : "Tạo phòng mới";
-    roomInfo.innerHTML = `Chế độ: Multiplayer | Phòng: ${roomDisplay} | Người chơi: Trắng`;
+    const colorText = selectedColor === "white" ? "Trắng" : "Đen";
+    // SỬA: Thêm thông tin màu và lượt đầu random
+    roomInfo.innerHTML = `Chế độ: Multiplayer | Phòng: ${roomDisplay} | Người chơi: ${colorText} | Lượt đầu: Random`;
   }
 }
 
@@ -64,6 +89,7 @@ function generateRoomId() {
   return Math.random().toString(36).substring(2, 10).toUpperCase();
 }
 
+// SỬA: Hàm bắt đầu game - thêm playerColor
 function startGame() {
   const roomInput = document.getElementById("roomInput");
   let finalRoomId = roomInput.value.trim();
@@ -78,6 +104,7 @@ function startGame() {
     mode: selectedMode,
     roomId: finalRoomId,
     aiLevel: selectedAILevel,
+    playerColor: selectedColor, // THÊM: màu người chơi
   });
 
   if (!selectedMode) {
@@ -85,18 +112,19 @@ function startGame() {
     return;
   }
 
-  // Gửi thông tin về main app
+  // Gửi thông tin về main app - THÊM playerColor
   window.parent.postMessage(
     {
       type: "GAME_START",
       mode: selectedMode,
       roomId: finalRoomId,
       aiLevel: selectedMode === "ai" ? selectedAILevel : null,
+      playerColor: selectedColor, // THÊM
     },
     "*"
   );
 
-  console.log("Sent GAME_START to main app");
+  console.log("Sent GAME_START to main app with color:", selectedColor);
 }
 
 function goBackToHome() {
@@ -131,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Khởi tạo mặc định
   document.querySelector('[data-level="2"]').classList.add("active");
+  document.querySelector('[data-color="white"]').classList.add("active"); // THÊM: khởi tạo màu mặc định
 
   // Hiệu ứng khi load
   document.querySelector(".mode-wrapper").style.animation =

@@ -1013,3 +1013,139 @@ input:focus {
     font-size: 1.5em;
   }
 }
+/* THÊM: Undo/Redo Controls */
+.undo-redo-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.undo-btn,
+.redo-btn {
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.undo-btn:hover,
+.redo-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
+}
+
+.undo-btn:disabled,
+.redo-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.undo-btn:disabled:hover,
+.redo-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+/* THÊM: Game Layout mới */
+.game-layout {
+  display: flex;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+.game-board-container {
+  flex: 0 0 auto;
+}
+
+.game-info-sidebar {
+  flex: 1;
+  min-width: 300px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 105, 180, 0.2);
+}
+
+/* Status và Turn */
+.game-status {
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+#status {
+  font-size: 1.4em;
+  font-weight: 600;
+  color: #ff69b4;
+  margin-bottom: 10px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #fff5f7, #ffeef2);
+  border-radius: 10px;
+  border-left: 4px solid #ff69b4;
+}
+
+#turn {
+  font-size: 1.3em;
+  font-weight: 600;
+  padding: 15px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Game Controls trong sidebar */
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.undo-redo-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+/* Game Features */
+.game-features {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}

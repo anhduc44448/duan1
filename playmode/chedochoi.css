@@ -249,6 +249,62 @@ body {
   line-height: 1.4;
 }
 
+/* THÊM: Nút chọn màu */
+.color-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.color-btn {
+  padding: 15px 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  text-align: center;
+}
+
+.color-btn:hover {
+  border-color: #ff69b4;
+  transform: translateY(-2px);
+}
+
+.color-btn.active {
+  border-color: #ff69b4;
+  background: linear-gradient(135deg, #fff5f7, #ffeef2);
+  color: #ff69b4;
+  font-weight: 600;
+}
+
+.color-btn[data-color="white"] {
+  color: #666;
+}
+.color-btn[data-color="black"] {
+  color: #333;
+}
+.color-btn[data-color="random"] {
+  color: #ff69b4;
+}
+
+.color-btn[data-color="white"].active {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: #333;
+}
+.color-btn[data-color="black"].active {
+  background: linear-gradient(135deg, #333, #555);
+  color: white;
+}
+
 /* Nút cấp độ AI */
 .ai-level-buttons {
   display: grid;
@@ -485,6 +541,10 @@ body {
     font-size: 1.7em;
   }
 
+  .color-selection {
+    grid-template-columns: 1fr;
+  }
+
   .ai-level-buttons {
     grid-template-columns: 1fr;
   }
@@ -531,6 +591,7 @@ body {
     padding: 12px 15px;
   }
 
+  .color-btn,
   .level-btn {
     padding: 12px 15px;
   }

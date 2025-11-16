@@ -6,6 +6,10 @@ let selectedSquare = null;
 let currentRoom = null;
 let currentMode = null;
 let currentAILevel = 2;
+let playerColor = "white"; // Biến lưu màu người chơi
+let currentWhiteToMove = true; // Biến lưu trạng thái lượt đi hiện tại
+let canUndo = false; // THÊM: Biến theo dõi trạng thái nút undo
+let canRedo = false; // THÊM: Biến theo dõi trạng thái nút redo
 
 // HÀM MỚI: Xử lý bắt đầu game từ cấu hình
 function startGameFromConfig(config) {
@@ -15,23 +19,29 @@ function startGameFromConfig(config) {
   currentRoom = config.roomId;
   currentAILevel = config.aiLevel || 2;
 
+  // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
+
   // Join room với thông tin đầy đủ
   socket.emit("join", {
     room: currentRoom,
     mode: currentMode,
     aiLevel: currentAILevel,
+    playerColor: config.playerColor || "white", // Vẫn gửi lựa chọn màu cho AI mode
   });
 
-  // Cập nhật status
+  // Reset undo/redo state
+  updateUndoRedoButtons(false, false);
+
+  // Cập nhật status tạm thời
   const statusEl = document.getElementById("status");
   if (statusEl) {
     if (currentMode === "ai") {
       const levelNames = ["Dễ", "Trung Bình", "Khó"];
-      statusEl.innerText = `Chế độ AI - Cấp độ: ${
+      statusEl.innerText = `Đang kết nối... Chế độ AI - Cấp độ: ${
         levelNames[currentAILevel - 1] || "Trung Bình"
       }`;
     } else {
-      statusEl.innerText = `Đã tham gia phòng: ${currentRoom} (Vs Người)`;
+      statusEl.innerText = `Đang kết nối... Phòng: ${currentRoom}`;
     }
   }
 
@@ -79,9 +89,17 @@ function joinRoom() {
   if (room) {
     currentRoom = room;
     currentMode = "multi";
-    socket.emit("join", { room: currentRoom, mode: "multi" });
-    document.getElementById("status").innerText =
-      "Đã tham gia phòng: " + currentRoom + " (Vs Người)";
+    // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
+    socket.emit("join", {
+      room: currentRoom,
+      mode: "multi",
+      // KHÔNG gửi playerColor cho multiplayer
+    });
+
+    // Reset undo/redo state
+    updateUndoRedoButtons(false, false);
+
+    document.getElementById("status").innerText = "Đang kết nối...";
     showGameSection();
   } else {
     alert("Vui lòng nhập Room ID!");
@@ -96,17 +114,20 @@ function selectMode(mode, aiLevel = null) {
 
   if (mode === "ai") {
     currentRoom = "ai_" + Math.random().toString(36).substring(2, 10);
+    // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
     socket.emit("join", {
       room: currentRoom,
       mode: "ai",
       aiLevel: currentAILevel,
+      playerColor: "white", // Vẫn gửi màu mặc định cho AI
     });
+
+    // Reset undo/redo state
+    updateUndoRedoButtons(false, false);
+
     const statusEl = document.getElementById("status");
     if (statusEl) {
-      const levelNames = ["Dễ", "Trung Bình", "Khó"];
-      statusEl.innerText = `Đã tham gia phòng AI - Cấp độ: ${
-        levelNames[currentAILevel - 1] || "Trung Bình"
-      }`;
+      statusEl.innerText = "Đang kết nối...";
     }
     document.getElementById("mode-iframe").style.display = "none";
     showGameSection();
@@ -164,18 +185,50 @@ function drawBoard(board) {
         square.classList.add("selected");
       }
 
-      square.addEventListener("click", () => handleClick(row, col));
+      square.addEventListener("click", () => handleClick(row, col, piece));
       boardDiv.appendChild(square);
     }
   }
 }
 
-// Sync: Handle click board
-function handleClick(row, col) {
+// SỬA QUAN TRỌNG: Handle click board - sửa logic kiểm tra lượt đi
+function handleClick(row, col, piece) {
   if (!currentRoom) {
     alert("Bạn cần join room trước!");
     return;
   }
+
+  console.log(
+    `🖱️ Click tại [${row}, ${col}], quân: ${piece}, lượt hiện tại: ${
+      currentWhiteToMove ? "Trắng" : "Đen"
+    }, màu người chơi: ${playerColor}`
+  );
+
+  // THÊM: Kiểm tra xem ô được click có quân cờ không và có phải quân của người chơi không
+  if (piece !== "--") {
+    const pieceColor = piece[0]; // 'w' hoặc 'b'
+    const isPlayerPiece =
+      (playerColor === "white" && pieceColor === "w") ||
+      (playerColor === "black" && pieceColor === "b");
+
+    if (!isPlayerPiece) {
+      console.log("❌ Đây không phải quân của bạn!");
+      alert("Đây không phải quân của bạn!");
+      return;
+    }
+  }
+
+  // SỬA: Kiểm tra lượt đi dựa trên màu người chơi và lượt hiện tại
+  const isPlayerTurn =
+    (playerColor === "white" && currentWhiteToMove) ||
+    (playerColor === "black" && !currentWhiteToMove);
+
+  if (!isPlayerTurn) {
+    console.log("⏳ Chưa đến lượt của bạn!");
+    alert("Chưa đến lượt của bạn!");
+    return;
+  }
+
   if (selectedSquare) {
     if (selectedSquare.row === row && selectedSquare.col === col) {
       selectedSquare = null;
@@ -190,12 +243,101 @@ function handleClick(row, col) {
       document.getElementById("turn").innerText = "Đang xử lý...";
     }
 
+    console.log(
+      `🎯 Di chuyển từ [${from.row}, ${from.col}] đến [${to.row}, ${to.col}]`
+    );
     socket.emit("make_move", { room: currentRoom, from, to });
     selectedSquare = null;
   } else {
-    selectedSquare = { row, col };
-    drawBoard(currentBoard);
+    // THÊM: Chỉ cho phép chọn quân của mình
+    if (piece !== "--") {
+      const pieceColor = piece[0];
+      const isPlayerPiece =
+        (playerColor === "white" && pieceColor === "w") ||
+        (playerColor === "black" && pieceColor === "b");
+
+      if (isPlayerPiece) {
+        selectedSquare = { row, col };
+        drawBoard(currentBoard);
+      } else {
+        console.log("❌ Bạn không thể chọn quân của đối phương!");
+        alert("Bạn không thể chọn quân của đối phương!");
+      }
+    }
   }
+}
+
+// THÊM: Hàm undo move
+function undoMove() {
+  if (!currentRoom) {
+    alert("Bạn cần join room trước!");
+    return;
+  }
+
+  if (!canUndo) {
+    alert("Không thể undo lúc này!");
+    return;
+  }
+
+  console.log("↩️ Yêu cầu undo move");
+  socket.emit("undo_move", {
+    room: currentRoom,
+    mode: currentMode,
+  });
+}
+
+// THÊM: Hàm redo move
+function redoMove() {
+  if (!currentRoom) {
+    alert("Bạn cần join room trước!");
+    return;
+  }
+
+  if (!canRedo) {
+    alert("Không thể redo lúc này!");
+    return;
+  }
+
+  console.log("↪️ Yêu cầu redo move");
+  socket.emit("redo_move", {
+    room: currentRoom,
+    mode: currentMode,
+  });
+}
+
+// THÊM: Hàm cập nhật trạng thái nút undo/redo
+function updateUndoRedoButtons(canUndoState, canRedoState) {
+  const undoBtn = document.getElementById("undoBtn");
+  const redoBtn = document.getElementById("redoBtn");
+
+  if (undoBtn) {
+    undoBtn.disabled = !canUndoState;
+    undoBtn.title = canUndoState ? "Hủy nước đi (Ctrl+Z)" : "Không thể undo";
+    // THÊM: Cập nhật màu sắc cho nút
+    if (canUndoState) {
+      undoBtn.style.background = "linear-gradient(45deg, #ff69b4, #ff1493)";
+    } else {
+      undoBtn.style.background = "#ccc";
+    }
+  }
+
+  if (redoBtn) {
+    redoBtn.disabled = !canRedoState;
+    redoBtn.title = canRedoState
+      ? "Làm lại nước đi (Ctrl+Y)"
+      : "Không thể redo";
+    // THÊM: Cập nhật màu sắc cho nút
+    if (canRedoState) {
+      redoBtn.style.background = "linear-gradient(45deg, #ff69b4, #ff1493)";
+    } else {
+      redoBtn.style.background = "#ccc";
+    }
+  }
+
+  canUndo = canUndoState;
+  canRedo = canRedoState;
+
+  console.log(`🔄 Undo: ${canUndo}, Redo: ${canRedo}`);
 }
 
 // Sync: Reset board
@@ -210,12 +352,54 @@ function resetBoard() {
 
 // THÊM: Socket event cho reset
 socket.on("reset", (data) => {
-  if (currentMode === "ai") {
-    document.getElementById("status").innerText = "Đã reset - Chế độ AI";
-  } else {
-    document.getElementById("status").innerText =
-      "Đã reset - Chế độ Multiplayer";
+  console.log("🔄 Board đã được reset");
+});
+
+// THÊM QUAN TRỌNG: Socket event nhận màu được gán từ server
+socket.on("player_assigned", (data) => {
+  playerColor = data.color;
+  console.log(`🎯 Server gán màu cho bạn: ${playerColor}`);
+
+  // Cập nhật status với màu thực tế
+  const statusEl = document.getElementById("status");
+  if (statusEl) {
+    const colorText = playerColor === "white" ? "Trắng" : "Đen";
+    if (currentMode === "ai") {
+      const levelNames = ["Dễ", "Trung Bình", "Khó"];
+      statusEl.innerText = `Chế độ AI - Cấp độ: ${
+        levelNames[currentAILevel - 1] || "Trung Bình"
+      } | Màu: ${colorText}`;
+    } else {
+      statusEl.innerText = `Đã tham gia phòng: ${currentRoom} | Màu: ${colorText}`;
+    }
   }
+});
+
+// THÊM: Socket event phòng đầy
+socket.on("room_full", (data) => {
+  alert(data.msg);
+  showSection("home-section");
+});
+
+// THÊM: Socket events cho undo/redo
+socket.on("undo_success", (data) => {
+  console.log("✅ " + data.msg);
+  // Có thể thêm thông báo toast ở đây
+});
+
+socket.on("undo_failed", (data) => {
+  console.log("❌ " + data.msg);
+  alert(data.msg);
+});
+
+socket.on("redo_success", (data) => {
+  console.log("✅ " + data.msg);
+  // Có thể thêm thông báo toast ở đây
+});
+
+socket.on("redo_failed", (data) => {
+  console.log("❌ " + data.msg);
+  alert(data.msg);
 });
 
 // Sync: Socket events
@@ -228,12 +412,42 @@ socket.on("connect", () => {
   console.log("✅ Connected to server");
 });
 
+// SỬA QUAN TRỌNG: Socket event board_update - cập nhật biến currentWhiteToMove và undo/redo state
 socket.on("board_update", (data) => {
   currentBoard = data.board;
+  currentWhiteToMove = data.whiteToMove; // THÊM: Cập nhật trạng thái lượt đi
+
   drawBoard(currentBoard);
-  document.getElementById("turn").innerText = data.whiteToMove
-    ? "Lượt Trắng"
-    : "Lượt Đen";
+
+  // THÊM: Cập nhật trạng thái nút undo/redo
+  const canUndoState = data.canUndo !== undefined ? data.canUndo : canUndo;
+  const canRedoState = data.canRedo !== undefined ? data.canRedo : canRedo;
+  updateUndoRedoButtons(canUndoState, canRedoState);
+
+  // SỬA: Cập nhật hiển thị lượt đi với thông tin chi tiết
+  const turnEl = document.getElementById("turn");
+  if (turnEl) {
+    const currentTurnColor = data.whiteToMove ? "Trắng" : "Đen";
+    const isPlayerTurn =
+      (playerColor === "white" && data.whiteToMove) ||
+      (playerColor === "black" && !data.whiteToMove);
+
+    if (isPlayerTurn) {
+      turnEl.innerText = `Lượt của bạn (${currentTurnColor})`;
+      turnEl.style.color = "#ff69b4";
+      turnEl.style.background = "linear-gradient(135deg, #fff5f7, #ffeef2)";
+      turnEl.style.border = "2px solid #ff69b4";
+    } else {
+      turnEl.innerText = `Lượt đối phương (${currentTurnColor})`;
+      turnEl.style.color = "#666";
+      turnEl.style.background = "linear-gradient(135deg, #f8f9fa, #e9ecef)";
+      turnEl.style.border = "2px solid #ddd";
+    }
+  }
+
+  console.log(
+    `🔄 Board updated - Lượt hiện tại: ${data.whiteToMove ? "Trắng" : "Đen"}`
+  );
 });
 
 socket.on("invalid_move", (data) => {
@@ -243,6 +457,35 @@ socket.on("invalid_move", (data) => {
 
 socket.on("game_over", (data) => {
   alert(data.msg);
+});
+
+// THÊM: Keyboard shortcuts cho undo/redo
+document.addEventListener("keydown", function (event) {
+  // Chỉ xử lý khi đang ở trong game section
+  const gameSection = document.getElementById("game-section");
+  if (!gameSection || gameSection.style.display !== "block") {
+    return;
+  }
+
+  if ((event.ctrlKey || event.metaKey) && !event.altKey) {
+    if (event.key === "z" || event.key === "Z") {
+      event.preventDefault();
+      if (canUndo) {
+        console.log("⌨️ Keyboard shortcut: Ctrl+Z - Undo");
+        undoMove();
+      } else {
+        console.log("⌨️ Ctrl+Z pressed but cannot undo");
+      }
+    } else if (event.key === "y" || event.key === "Y") {
+      event.preventDefault();
+      if (canRedo) {
+        console.log("⌨️ Keyboard shortcut: Ctrl+Y - Redo");
+        redoMove();
+      } else {
+        console.log("⌨️ Ctrl+Y pressed but cannot redo");
+      }
+    }
+  }
 });
 
 // QUAN TRỌNG: CẬP NHẬT message listener để xử lý GAME_START
@@ -264,6 +507,9 @@ window.addEventListener("message", (event) => {
 // Sync: Init app
 window.onload = function () {
   showSection("home-section");
+
+  // THÊM: Khởi tạo undo/redo state
+  updateUndoRedoButtons(false, false);
 };
 
 socket.on("disconnect", (reason) => {

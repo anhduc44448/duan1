@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Realtime Chess AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <!-- Path sync: Load main CSS từ static/ -->
     <link rel="stylesheet" href="./static/style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
@@ -33,7 +32,6 @@
                 <div class="home-text">
                     <h2>Cờ vua đỉnh cao với AI thời gian thực!</h2>
                     <button class="play-button" onclick="loadModeSection()">
-                        <!-- Sync: Click load iframe từ playmode/ -->
                         <i class="fas fa-play"></i> Bắt Đầu Chơi
                     </button>
                 </div>
@@ -264,7 +262,7 @@
                         </div>
                         <div class="contact-info">
                             <h3>Địa Chỉ</h3>
-                            <p>157 Phạm Như Xương, Hòa Khánh,Đà Nẵng, Việt Nam</p>
+                            <p>157 Phạm Như Xương, Hòa Khánh, Đà Nẵng, Việt Nam</p>
                             <span class="contact-status">
                                 <i class="fas fa-circle online"></i> Online 24/7
                             </span>
@@ -282,7 +280,6 @@
 
         <!-- Section chọn mode: Iframe load từ playmode/chedochoi.html -->
         <div id="mode-section" class="section">
-            <!-- Path sync: Src từ root đến playmode/ -->
             <iframe id="mode-iframe" src="./playmode/chedochoi.html"
                 style="width:100%; height:600px; border:none; display:none;"></iframe>
         </div>
@@ -295,13 +292,39 @@
             <p id="status">Chưa tham gia phòng</p>
         </div>
 
-        <!-- Section bàn cờ -->
-        <!-- Trong phần game-section, cập nhật hiển thị lượt đi -->
+        <!-- Section bàn cờ MỚI với layout 2 cột -->
         <div id="game-section" class="section">
-            <div id="status">Chưa tham gia phòng</div>
-            <div id="turn">Vui lòng chờ...</div> <!-- THÊM: Hiển thị lượt đi chi tiết -->
-            <div id="chessboard"></div>
-            <button onclick="resetBoard()"><i class="fas fa-sync-alt"></i> Reset Room</button>
+            <div class="game-layout">
+                <!-- Bên trái: Bàn cờ -->
+                <div class="game-board-container">
+                    <div id="chessboard"></div>
+                </div>
+
+                <!-- Bên phải: Thông tin và controls -->
+                <div class="game-info-sidebar">
+                    <!-- Status và Turn -->
+                    <div class="game-status">
+                        <div id="status"></div>
+                        <div id="turn">Vui lòng chờ...</div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="game-controls">
+                        <div class="undo-redo-controls">
+                            <button id="undoBtn" class="undo-btn" onclick="undoMove()" disabled>
+                                <i class="fas fa-undo"></i> Undo (Ctrl+Z)
+                            </button>
+                            <button id="redoBtn" class="redo-btn" onclick="redoMove()" disabled>
+                                <i class="fas fa-redo"></i> Redo (Ctrl+Y)
+                            </button>
+                        </div>
+
+                        <button onclick="resetBoard()" class="reset-btn">
+                            <i class="fas fa-sync-alt"></i> Reset Room
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Section Đăng Nhập (Placeholder) -->
@@ -311,7 +334,6 @@
             <button onclick="showSection('home-section')">Quay Lại</button>
         </div>
     </div>
-
 
     <!-- Path sync: Load main JS từ static/ -->
     <script src="./static/script.js"></script>
