@@ -1,6 +1,6 @@
 // Sync: Socket init ở main, toàn cục cho toàn app
 const socket = io();
-const boardDiv = document.getElementById("chessboard");
+let boardDiv = document.getElementById("chessboard");
 let currentBoard = [];
 let selectedSquare = null;
 let currentRoom = null;
@@ -10,6 +10,126 @@ let playerColor = "white"; // Biến lưu màu người chơi
 let currentWhiteToMove = true; // Biến lưu trạng thái lượt đi hiện tại
 let canUndo = false; // THÊM: Biến theo dõi trạng thái nút undo
 let canRedo = false; // THÊM: Biến theo dõi trạng thái nút redo
+let lastMove = null; // THÊM: Biến theo dõi nước đi cuối cùng
+
+// THÊM: Biến và hàm quản lý nhạc nền
+let backgroundMusic = null;
+
+// THÊM: Hàm khởi tạo nhạc nền
+function initBackgroundMusic() {
+  backgroundMusic = document.getElementById("background-music");
+
+  if (!backgroundMusic) {
+    console.log("❌ Không tìm thấy element nhạc nền");
+    return;
+  }
+
+  // Đặt volume mặc định
+  backgroundMusic.volume = 0.5; // 50% volume
+
+  console.log("✅ Đã khởi tạo nhạc nền");
+}
+
+// THÊM: Hàm quản lý nhạc nền theo section
+function manageBackgroundMusic(sectionId) {
+  if (!backgroundMusic) return;
+
+  const gameSections = ["game-section", "multi-room-section"];
+  const isGameSection = gameSections.includes(sectionId);
+
+  if (isGameSection) {
+    // Tắt nhạc khi vào game
+    backgroundMusic.pause();
+    console.log("🔇 Đã tắt nhạc nền (đang trong game)");
+  } else {
+    // Bật nhạc khi ở các section khác
+    backgroundMusic.play().catch((error) => {
+      console.log("❌ Lỗi phát nhạc:", error);
+    });
+    console.log("🔊 Đã bật nhạc nền");
+  }
+}
+
+// THÊM: Biến và hàm quản lý âm thanh di chuyển
+let moveSound = null;
+
+// THÊM: Hàm khởi tạo âm thanh di chuyển
+function initMoveSound() {
+  moveSound = document.getElementById("move-sound");
+
+  if (!moveSound) {
+    console.log("❌ Không tìm thấy element âm thanh di chuyển");
+    return;
+  }
+
+  // Đặt volume cho âm thanh di chuyển
+  moveSound.volume = 0.7; // 70% volume
+
+  console.log("✅ Đã khởi tạo âm thanh di chuyển");
+}
+
+// THÊM: Hàm phát âm thanh khi di chuyển quân cờ
+function playMoveSound() {
+  if (!moveSound) return;
+
+  // Reset âm thanh để có thể phát lại ngay lập tức
+  moveSound.currentTime = 0;
+
+  moveSound.play().catch((error) => {
+    console.log("❌ Lỗi phát âm thanh di chuyển:", error);
+  });
+
+  console.log("🔊 Đã phát âm thanh di chuyển");
+}
+
+// THÊM: Hàm tạo hiệu ứng di chuyển quân cờ
+function animateMove(from, to, board) {
+  console.log(
+    `🎬 Bắt đầu animation từ [${from.row}, ${from.col}] đến [${to.row}, ${to.col}]`
+  );
+
+  // Vẽ board với hiệu ứng di chuyển
+  drawBoard(board, from, to);
+
+  // Phát âm thanh di chuyển sau một chút delay
+  setTimeout(() => {
+    playMoveSound();
+  }, 200);
+
+  // Xóa hiệu ứng sau khi animation kết thúc
+  setTimeout(() => {
+    const squares = document.querySelectorAll(".piece-moving, .capture");
+    squares.forEach((square) => {
+      square.classList.remove("piece-moving", "capture");
+    });
+  }, 600);
+}
+
+// THÊM: Cập nhật hàm showSection để quản lý nhạc nền
+const originalShowSection = showSection;
+showSection = function (sectionId) {
+  originalShowSection(sectionId);
+  manageBackgroundMusic(sectionId);
+};
+
+// THÊM: Cập nhật các hàm navigation khác
+const originalLoadModeSection = loadModeSection;
+loadModeSection = function () {
+  originalLoadModeSection();
+  manageBackgroundMusic("mode-section");
+};
+
+const originalShowGameSection = showGameSection;
+showGameSection = function () {
+  originalShowGameSection();
+  manageBackgroundMusic("game-section");
+};
+
+const originalJoinRoom = joinRoom;
+joinRoom = function () {
+  originalJoinRoom();
+  manageBackgroundMusic("multi-room-section");
+};
 
 // HÀM MỚI: Xử lý bắt đầu game từ cấu hình
 function startGameFromConfig(config) {
@@ -137,10 +257,10 @@ function selectMode(mode, aiLevel = null) {
   }
 }
 
-// Sync: Draw board (gốc)
-function drawBoard(board) {
+// SỬA: Draw board với hiệu ứng di chuyển chậm
+function drawBoard(board, fromSquare = null, toSquare = null) {
   if (!boardDiv || !Array.isArray(board) || board.length !== 8) return;
-  boardDiv.innerHTML = "";
+
   const pieceMap = {
     wp: "tottrang",
     bp: "totden",
@@ -155,6 +275,18 @@ function drawBoard(board) {
     wK: "vuatrang",
     bK: "vuaden",
   };
+
+  // Tạo board mới
+  const newBoardDiv = document.createElement("div");
+  newBoardDiv.id = "chessboard";
+  newBoardDiv.style.display = "grid";
+  newBoardDiv.style.gridTemplateColumns = "repeat(8, 62.5px)";
+  newBoardDiv.style.gridTemplateRows = "repeat(8, 62.5px)";
+  newBoardDiv.style.width = "500px";
+  newBoardDiv.style.height = "500px";
+  newBoardDiv.style.margin = "15px auto";
+  newBoardDiv.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.1)";
+
   for (let row = 0; row < 8; row++) {
     for (let col = 0; col < 8; col++) {
       const square = document.createElement("div");
@@ -164,11 +296,37 @@ function drawBoard(board) {
       square.dataset.col = col;
 
       const piece = board[row][col];
+
+      // Kiểm tra nếu đây là ô di chuyển đến
+      const isMoveToSquare =
+        toSquare && toSquare.row === row && toSquare.col === col;
+      const isMoveFromSquare =
+        fromSquare && fromSquare.row === row && fromSquare.col === col;
+
       if (piece !== "--") {
         const img = document.createElement("img");
         const imgSrc = `./static/images/${pieceMap[piece] || piece}.png`;
         img.src = imgSrc;
         img.alt = piece;
+        img.style.width = "60px";
+        img.style.height = "60px";
+        img.style.pointerEvents = "none";
+
+        // Thêm hiệu ứng cho quân cờ vừa di chuyển
+        if (isMoveToSquare) {
+          img.classList.add("piece-moving");
+          square.classList.add("piece-moving");
+
+          // Thêm hiệu ứng capture nếu có quân bị ăn
+          if (
+            currentBoard[row] &&
+            currentBoard[row][col] !== "--" &&
+            currentBoard[row][col] !== piece
+          ) {
+            square.classList.add("capture");
+          }
+        }
+
         img.onload = () => console.log("Tải ảnh thành công:", imgSrc);
         img.onerror = () => {
           console.error("Lỗi tải ảnh:", imgSrc);
@@ -177,6 +335,7 @@ function drawBoard(board) {
         square.appendChild(img);
       }
 
+      // Đánh dấu ô được chọn
       if (
         selectedSquare &&
         selectedSquare.row === row &&
@@ -185,13 +344,27 @@ function drawBoard(board) {
         square.classList.add("selected");
       }
 
+      // Thêm hiệu ứng cho ô đi từ (nếu có)
+      if (isMoveFromSquare && piece === "--") {
+        square.style.backgroundColor = "rgba(0, 100, 255, 0.2)";
+        square.style.transition = "background-color 1s ease";
+      }
+
       square.addEventListener("click", () => handleClick(row, col, piece));
-      boardDiv.appendChild(square);
+      newBoardDiv.appendChild(square);
     }
   }
+
+  // Thay thế board cũ bằng board mới
+  if (boardDiv.parentNode) {
+    boardDiv.parentNode.replaceChild(newBoardDiv, boardDiv);
+  }
+
+  // Cập nhật reference
+  boardDiv = newBoardDiv;
 }
 
-// SỬA QUAN TRỌNG: Handle click board - sửa logic kiểm tra lượt đi
+// SỬA QUAN TRỌNG: Handle click board - sửa logic kiểm tra lượt đi và thêm animation
 function handleClick(row, col, piece) {
   if (!currentRoom) {
     alert("Bạn cần join room trước!");
@@ -246,7 +419,21 @@ function handleClick(row, col, piece) {
     console.log(
       `🎯 Di chuyển từ [${from.row}, ${from.col}] đến [${to.row}, ${to.col}]`
     );
-    socket.emit("make_move", { room: currentRoom, from, to });
+
+    // THÊM: Tạo hiệu ứng di chuyển tạm thời
+    const tempBoard = JSON.parse(JSON.stringify(currentBoard));
+    const movingPiece = tempBoard[from.row][from.col];
+    tempBoard[from.row][from.col] = "--";
+    tempBoard[to.row][to.col] = movingPiece;
+
+    // Hiển thị animation
+    animateMove(from, to, tempBoard);
+
+    // Gửi move đến server sau khi bắt đầu animation
+    setTimeout(() => {
+      socket.emit("make_move", { room: currentRoom, from, to });
+    }, 400);
+
     selectedSquare = null;
   } else {
     // THÊM: Chỉ cho phép chọn quân của mình
@@ -265,6 +452,24 @@ function handleClick(row, col, piece) {
       }
     }
   }
+}
+
+// THÊM: Hàm đầu hàng
+function resignGame() {
+  if (!currentRoom) {
+    alert("Bạn cần join room trước!");
+    return;
+  }
+
+  if (!confirm("Bạn có chắc chắn muốn đầu hàng?")) {
+    return;
+  }
+
+  console.log("🏳️ Yêu cầu đầu hàng");
+  socket.emit("resign", {
+    room: currentRoom,
+    mode: currentMode,
+  });
 }
 
 // THÊM: Hàm undo move
@@ -402,6 +607,26 @@ socket.on("redo_failed", (data) => {
   alert(data.msg);
 });
 
+// THÊM: Socket event cho game over từ đầu hàng
+socket.on("game_over", (data) => {
+  if (data.type === "resign") {
+    // Hiển thị thông báo đầu hàng
+    alert(data.msg);
+
+    // Có thể thêm hiệu ứng visual đặc biệt cho đầu hàng
+    const boardDiv = document.getElementById("chessboard");
+    if (boardDiv) {
+      boardDiv.style.opacity = "0.7";
+      setTimeout(() => {
+        boardDiv.style.opacity = "1";
+      }, 1000);
+    }
+  } else {
+    // Xử lý thông báo game over thông thường
+    alert(data.msg);
+  }
+});
+
 // Sync: Socket events
 socket.on("connect_error", (error) => {
   console.error("Connection error:", error);
@@ -414,10 +639,52 @@ socket.on("connect", () => {
 
 // SỬA QUAN TRỌNG: Socket event board_update - cập nhật biến currentWhiteToMove và undo/redo state
 socket.on("board_update", (data) => {
+  // Kiểm tra xem có phải là update từ AI không (không phải từ người chơi hiện tại)
+  const wasPlayerTurn = currentWhiteToMove;
+  const oldBoard = currentBoard;
   currentBoard = data.board;
   currentWhiteToMove = data.whiteToMove; // THÊM: Cập nhật trạng thái lượt đi
 
-  drawBoard(currentBoard);
+  // Tìm nước đi vừa thực hiện (so sánh với board cũ)
+  let moveFrom = null;
+  let moveTo = null;
+
+  if (oldBoard && oldBoard.length === 8) {
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        if (oldBoard[row][col] !== "--" && currentBoard[row][col] === "--") {
+          moveFrom = { row, col };
+        }
+        if (
+          oldBoard[row][col] !== currentBoard[row][col] &&
+          currentBoard[row][col] !== "--"
+        ) {
+          moveTo = { row, col };
+        }
+      }
+    }
+  }
+
+  // Nếu tìm thấy nước đi, hiển thị animation
+  if (moveFrom && moveTo) {
+    animateMove(moveFrom, moveTo, currentBoard);
+  } else {
+    // Nếu không tìm thấy (reset game, etc.), vẽ bình thường
+    drawBoard(currentBoard);
+  }
+
+  // THÊM: Phát âm thanh nếu là lượt của AI (khi lượt thay đổi từ người chơi sang AI)
+  if (
+    currentMode === "ai" &&
+    wasPlayerTurn &&
+    !currentWhiteToMove &&
+    moveFrom &&
+    moveTo
+  ) {
+    setTimeout(() => {
+      playMoveSound();
+    }, 300);
+  }
 
   // THÊM: Cập nhật trạng thái nút undo/redo
   const canUndoState = data.canUndo !== undefined ? data.canUndo : canUndo;
@@ -455,11 +722,7 @@ socket.on("invalid_move", (data) => {
   drawBoard(currentBoard);
 });
 
-socket.on("game_over", (data) => {
-  alert(data.msg);
-});
-
-// THÊM: Keyboard shortcuts cho undo/redo
+// THÊM: Keyboard shortcuts cho undo/redo và đầu hàng
 document.addEventListener("keydown", function (event) {
   // Chỉ xử lý khi đang ở trong game section
   const gameSection = document.getElementById("game-section");
@@ -484,9 +747,33 @@ document.addEventListener("keydown", function (event) {
       } else {
         console.log("⌨️ Ctrl+Y pressed but cannot redo");
       }
+    } else if (event.key === "r" || event.key === "R") {
+      event.preventDefault();
+      console.log("⌨️ Keyboard shortcut: Ctrl+R - Resign");
+      resignGame();
     }
   }
 });
+
+// THÊM: Cho phép user bật nhạc bằng 1 click bất kỳ (vượt autoplay policy)
+document.addEventListener(
+  "click",
+  function initAudio() {
+    if (backgroundMusic && backgroundMusic.paused) {
+      backgroundMusic
+        .play()
+        .then(() => {
+          console.log("🎵 Nhạc nền đã được kích hoạt bởi user click");
+        })
+        .catch((error) => {
+          console.log("❌ Lỗi phát nhạc:", error);
+        });
+    }
+    // Xóa event listener sau khi click đầu tiên
+    document.removeEventListener("click", initAudio);
+  },
+  { once: true }
+);
 
 // QUAN TRỌNG: CẬP NHẬT message listener để xử lý GAME_START
 window.addEventListener("message", (event) => {
@@ -506,10 +793,21 @@ window.addEventListener("message", (event) => {
 
 // Sync: Init app
 window.onload = function () {
+  // Khởi tạo nhạc nền
+  initBackgroundMusic();
+
+  // THÊM: Khởi tạo âm thanh di chuyển
+  initMoveSound();
+
   showSection("home-section");
 
   // THÊM: Khởi tạo undo/redo state
   updateUndoRedoButtons(false, false);
+
+  // Bật nhạc nền sau khi khởi tạo
+  setTimeout(() => {
+    manageBackgroundMusic("home-section");
+  }, 500);
 };
 
 socket.on("disconnect", (reason) => {

@@ -180,6 +180,14 @@
                                         <p>Vua và Xe di chuyển cùng lúc để bảo vệ Vua</p>
                                     </div>
                                 </div>
+                                <!-- THÊM: Luật đầu hàng -->
+                                <div class="rule-item">
+                                    <i class="fas fa-flag white-flag"></i>
+                                    <div>
+                                        <strong>Đầu Hàng (Resign)</strong>
+                                        <p>Khi thấy không thể thắng, có thể đầu hàng để kết thúc ván đấu</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -310,6 +318,7 @@
 
                     <!-- Controls -->
                     <div class="game-controls">
+                        <!-- Undo/Redo Controls -->
                         <div class="undo-redo-controls">
                             <button id="undoBtn" class="undo-btn" onclick="undoMove()" disabled>
                                 <i class="fas fa-undo"></i> Undo (Ctrl+Z)
@@ -319,9 +328,16 @@
                             </button>
                         </div>
 
-                        <button onclick="resetBoard()" class="reset-btn">
-                            <i class="fas fa-sync-alt"></i> Reset Room
-                        </button>
+                        <!-- THÊM: Action Controls chứa Reset và Đầu hàng -->
+                        <div class="action-controls">
+                            <button onclick="resetBoard()" class="reset-btn">
+                                <i class="fas fa-sync-alt"></i> Reset Room
+                            </button>
+                            <!-- NÚT ĐẦU HÀNG MỚI -->
+                            <button onclick="resignGame()" class="resign-btn">
+                                <i class="fas fa-flag"></i> Đầu Hàng
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -337,6 +353,18 @@
 
     <!-- Path sync: Load main JS từ static/ -->
     <script src="./static/script.js"></script>
+
+    <!-- THÊM: Nhạc nền tự động phát -->
+    <audio id="background-music" loop autoplay>
+        <!-- SỬA: Đường dẫn đến file âm thanh của bạn -->
+        <source src="./static/sounds/covua.mp3" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ audio.
+    </audio>
+    <!-- THÊM: Âm thanh di chuyển quân cờ -->
+    <audio id="move-sound" preload="auto">
+        <source src="./static/sounds/tiengco.mp3" type="audio/mpeg">
+        Trình duyệt của bạn không hỗ trợ audio.
+    </audio>
 </body>
 
 </html>

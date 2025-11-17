@@ -1149,3 +1149,161 @@ input:focus {
   border-radius: 8px;
   transition: all 0.3s ease;
 }
+/* THÊM: Layout cho action controls - đặt cùng phần game-controls */
+.action-controls {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+/* THÊM: Nút đầu hàng */
+.resign-btn {
+  background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.resign-btn:hover {
+  background: linear-gradient(45deg, #ff5252, #e53935);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+}
+
+.resign-btn:active {
+  transform: translateY(0);
+}
+
+/* Cập nhật reset button để đồng bộ */
+.reset-btn {
+  background: linear-gradient(45deg, #ff69b4, #ff1493);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 105, 180, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.reset-btn:hover {
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .action-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .resign-btn,
+  .reset-btn {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+/* THÊM: Hiệu ứng di chuyển quân cờ */
+.piece-moving {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.piece-moving img {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(1.1);
+}
+
+/* Hiệu ứng khi quân cờ được chọn */
+.square.selected {
+  background-color: rgba(0, 128, 255, 0.4) !important;
+  outline: 3px solid #ff69b4;
+  box-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+}
+
+/* Hiệu ứng gợi ý nước đi */
+.square.valid-move {
+  position: relative;
+}
+
+.square.valid-move::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(0, 255, 0, 0.3);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.7;
+  }
+}
+
+/* Hiệu ứng khi ăn quân */
+.square.capture {
+  background-color: rgba(255, 0, 0, 0.3) !important;
+  animation: capture-pulse 0.8s ease-in-out;
+}
+
+@keyframes capture-pulse {
+  0% {
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  50% {
+    background-color: rgba(255, 0, 0, 0.5);
+  }
+  100% {
+    background-color: rgba(255, 0, 0, 0.3);
+  }
+}
+
+/* Responsive cho mobile */
+@media (max-width: 600px) {
+  .piece-moving {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .piece-moving img {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1.05);
+  }
+}

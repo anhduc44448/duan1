@@ -306,6 +306,48 @@ def on_redo_move(data):
     else:
         emit("redo_failed", {"msg": "Chức năng redo không khả dụng trong chế độ này!"}, room=room)
 
+@socketio.on('resign')
+def on_resign(data):
+    """THÊM: Socket event cho đầu hàng"""
+    room = data["room"]
+    gs = game_states.get(room)
+    if not gs:
+        return
+    
+    player_id = request.sid
+    print(f"🏳️ Người chơi {player_id} ({gs.player_color}) đầu hàng trong room {room}")
+    
+    # Xác định người thắng
+    if gs.player_color == "white":
+        winner = "Đen"
+        loser = "Trắng"
+    else:
+        winner = "Trắng"
+        loser = "Đen"
+    
+    msg = f"{loser} đã đầu hàng! {winner} thắng!"
+    
+    # Gửi thông báo kết thúc game
+    emit("game_over", {"msg": msg, "type": "resign"}, room=room)
+    
+    # Reset game state sau khi đầu hàng
+    old_is_ai = gs.is_ai
+    old_ai_level = gs.ai_level
+    old_player_color = gs.player_color
+    
+    game_states[room] = CustomGameState()
+    gs = game_states[room]
+    gs.room = room
+    gs.is_ai = old_is_ai
+    gs.ai_level = old_ai_level
+    gs.player_color = old_player_color
+    gs.ai_color = "black" if gs.player_color == "white" else "white"
+    
+    # Random lượt đi đầu
+    gs.randomize_first_move()
+    
+    print(f"🔄 Đã reset game sau khi đầu hàng. Lượt đi đầu: {'Trắng' if gs.game_state.white_to_move else 'Đen'}")
+
 @socketio.on('reset')
 def on_reset(data):
     room = data["room"]
