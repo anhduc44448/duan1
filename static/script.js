@@ -6,14 +6,15 @@ let selectedSquare = null;
 let currentRoom = null;
 let currentMode = null;
 let currentAILevel = 2;
-let playerColor = "white"; // Biến lưu màu người chơi
-let currentWhiteToMove = true; // Biến lưu trạng thái lượt đi hiện tại
-let canUndo = false; // THÊM: Biến theo dõi trạng thái nút undo
-let canRedo = false; // THÊM: Biến theo dõi trạng thái nút redo
-let lastMove = null; // THÊM: Biến theo dõi nước đi cuối cùng
+let playerColor = "white";
+let currentWhiteToMove = true;
+let canUndo = false;
+let canRedo = false;
+let lastMove = null;
 
 // THÊM: Biến và hàm quản lý nhạc nền
 let backgroundMusic = null;
+let moveSound = null;
 
 // THÊM: Hàm khởi tạo nhạc nền
 function initBackgroundMusic() {
@@ -24,34 +25,9 @@ function initBackgroundMusic() {
     return;
   }
 
-  // Đặt volume mặc định
-  backgroundMusic.volume = 0.5; // 50% volume
-
+  backgroundMusic.volume = 0.5;
   console.log("✅ Đã khởi tạo nhạc nền");
 }
-
-// THÊM: Hàm quản lý nhạc nền theo section
-function manageBackgroundMusic(sectionId) {
-  if (!backgroundMusic) return;
-
-  const gameSections = ["game-section", "multi-room-section"];
-  const isGameSection = gameSections.includes(sectionId);
-
-  if (isGameSection) {
-    // Tắt nhạc khi vào game
-    backgroundMusic.pause();
-    console.log("🔇 Đã tắt nhạc nền (đang trong game)");
-  } else {
-    // Bật nhạc khi ở các section khác
-    backgroundMusic.play().catch((error) => {
-      console.log("❌ Lỗi phát nhạc:", error);
-    });
-    console.log("🔊 Đã bật nhạc nền");
-  }
-}
-
-// THÊM: Biến và hàm quản lý âm thanh di chuyển
-let moveSound = null;
 
 // THÊM: Hàm khởi tạo âm thanh di chuyển
 function initMoveSound() {
@@ -62,9 +38,7 @@ function initMoveSound() {
     return;
   }
 
-  // Đặt volume cho âm thanh di chuyển
-  moveSound.volume = 0.7; // 70% volume
-
+  moveSound.volume = 0.7;
   console.log("✅ Đã khởi tạo âm thanh di chuyển");
 }
 
@@ -72,14 +46,30 @@ function initMoveSound() {
 function playMoveSound() {
   if (!moveSound) return;
 
-  // Reset âm thanh để có thể phát lại ngay lập tức
   moveSound.currentTime = 0;
-
   moveSound.play().catch((error) => {
     console.log("❌ Lỗi phát âm thanh di chuyển:", error);
   });
 
   console.log("🔊 Đã phát âm thanh di chuyển");
+}
+
+// THÊM: Hàm quản lý nhạc nền theo section
+function manageBackgroundMusic(sectionId) {
+  if (!backgroundMusic) return;
+
+  const gameSections = ["game-section", "multi-room-section"];
+  const isGameSection = gameSections.includes(sectionId);
+
+  if (isGameSection) {
+    backgroundMusic.pause();
+    console.log("🔇 Đã tắt nhạc nền (đang trong game)");
+  } else {
+    backgroundMusic.play().catch((error) => {
+      console.log("❌ Lỗi phát nhạc:", error);
+    });
+    console.log("🔊 Đã bật nhạc nền");
+  }
 }
 
 // THÊM: Hàm tạo hiệu ứng di chuyển quân cờ
@@ -88,15 +78,12 @@ function animateMove(from, to, board) {
     `🎬 Bắt đầu animation từ [${from.row}, ${from.col}] đến [${to.row}, ${to.col}]`
   );
 
-  // Vẽ board với hiệu ứng di chuyển
   drawBoard(board, from, to);
 
-  // Phát âm thanh di chuyển sau một chút delay
   setTimeout(() => {
     playMoveSound();
   }, 200);
 
-  // Xóa hiệu ứng sau khi animation kết thúc
   setTimeout(() => {
     const squares = document.querySelectorAll(".piece-moving, .capture");
     squares.forEach((square) => {
@@ -105,31 +92,147 @@ function animateMove(from, to, board) {
   }, 600);
 }
 
-// THÊM: Cập nhật hàm showSection để quản lý nhạc nền
-const originalShowSection = showSection;
-showSection = function (sectionId) {
-  originalShowSection(sectionId);
-  manageBackgroundMusic(sectionId);
-};
+// THÊM: Authentication functions
+function showLoginForm() {
+  document.getElementById("login-form").style.display = "block";
+  document.getElementById("register-form").style.display = "none";
+}
 
-// THÊM: Cập nhật các hàm navigation khác
-const originalLoadModeSection = loadModeSection;
-loadModeSection = function () {
-  originalLoadModeSection();
-  manageBackgroundMusic("mode-section");
-};
+function showRegisterForm() {
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("register-form").style.display = "block";
+}
 
-const originalShowGameSection = showGameSection;
-showGameSection = function () {
-  originalShowGameSection();
-  manageBackgroundMusic("game-section");
-};
+async function login() {
+  const username = document.getElementById("login-username").value;
+  const password = document.getElementById("login-password").value;
 
-const originalJoinRoom = joinRoom;
-joinRoom = function () {
-  originalJoinRoom();
-  manageBackgroundMusic("multi-room-section");
-};
+  if (!username || !password) {
+    alert("Vui lòng nhập đầy đủ username và password");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+      checkLoginStatus();
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    alert("Lỗi kết nối đến server");
+    console.error("Login error:", error);
+  }
+}
+
+async function register() {
+  const username = document.getElementById("register-username").value;
+  const password = document.getElementById("register-password").value;
+  const confirmPassword = document.getElementById("confirm-password").value;
+
+  if (!username || !password || !confirmPassword) {
+    alert("Vui lòng nhập đầy đủ thông tin");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Mật khẩu xác nhận không khớp");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+      showLoginForm();
+      document.getElementById("register-username").value = "";
+      document.getElementById("register-password").value = "";
+      document.getElementById("confirm-password").value = "";
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    alert("Lỗi kết nối đến server");
+    console.error("Register error:", error);
+  }
+}
+
+async function logout() {
+  try {
+    const response = await fetch("/api/logout", { method: "POST" });
+    const data = await response.json();
+
+    if (data.success) {
+      alert(data.message);
+      checkLoginStatus();
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+}
+
+async function checkLoginStatus() {
+  try {
+    const response = await fetch("/api/user");
+    const data = await response.json();
+
+    const loginForm = document.getElementById("login-form");
+    const registerForm = document.getElementById("register-form");
+    const userInfo = document.getElementById("user-info");
+
+    if (data.logged_in) {
+      loginForm.style.display = "none";
+      registerForm.style.display = "none";
+      userInfo.style.display = "block";
+
+      document.getElementById("username-display").textContent =
+        data.user.username;
+      document.getElementById("games-played").textContent =
+        data.user.games_played;
+      document.getElementById("wins-count").textContent = data.user.wins;
+
+      updateNavigation(true, data.user.username);
+    } else {
+      loginForm.style.display = "block";
+      registerForm.style.display = "none";
+      userInfo.style.display = "none";
+
+      updateNavigation(false);
+    }
+  } catch (error) {
+    console.error("Check login status error:", error);
+  }
+}
+
+function updateNavigation(isLoggedIn, username = "") {
+  const navLinks = document.querySelector(".nav-links");
+  const loginLink = navLinks.querySelector('a[onclick*="login-section"]');
+
+  if (isLoggedIn) {
+    loginLink.innerHTML = `<i class="fas fa-user"></i> ${username}`;
+  } else {
+    loginLink.innerHTML = "Đăng Nhập";
+  }
+}
 
 // HÀM MỚI: Xử lý bắt đầu game từ cấu hình
 function startGameFromConfig(config) {
@@ -139,20 +242,15 @@ function startGameFromConfig(config) {
   currentRoom = config.roomId;
   currentAILevel = config.aiLevel || 2;
 
-  // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
-
-  // Join room với thông tin đầy đủ
   socket.emit("join", {
     room: currentRoom,
     mode: currentMode,
     aiLevel: currentAILevel,
-    playerColor: config.playerColor || "white", // Vẫn gửi lựa chọn màu cho AI mode
+    playerColor: config.playerColor || "white",
   });
 
-  // Reset undo/redo state
   updateUndoRedoButtons(false, false);
 
-  // Cập nhật status tạm thời
   const statusEl = document.getElementById("status");
   if (statusEl) {
     if (currentMode === "ai") {
@@ -165,7 +263,6 @@ function startGameFromConfig(config) {
     }
   }
 
-  // Ẩn iframe và hiện game
   document.getElementById("mode-iframe").style.display = "none";
   showGameSection();
 }
@@ -184,6 +281,7 @@ function showSection(sectionId) {
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
     targetSection.style.display = "block";
+    manageBackgroundMusic(sectionId);
     console.log("Section displayed:", sectionId);
   } else {
     console.error("Section not found:", sectionId);
@@ -209,14 +307,11 @@ function joinRoom() {
   if (room) {
     currentRoom = room;
     currentMode = "multi";
-    // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
     socket.emit("join", {
       room: currentRoom,
       mode: "multi",
-      // KHÔNG gửi playerColor cho multiplayer
     });
 
-    // Reset undo/redo state
     updateUndoRedoButtons(false, false);
 
     document.getElementById("status").innerText = "Đang kết nối...";
@@ -226,7 +321,7 @@ function joinRoom() {
   }
 }
 
-// Sync: Select mode (gọi từ message của playmode/chedochoi.js) - CẬP NHẬT
+// Sync: Select mode (gọi từ message của playmode/chedochoi.js)
 function selectMode(mode, aiLevel = null) {
   console.log("Selecting mode from playmode:", mode, "AI Level:", aiLevel);
   currentMode = mode;
@@ -234,15 +329,13 @@ function selectMode(mode, aiLevel = null) {
 
   if (mode === "ai") {
     currentRoom = "ai_" + Math.random().toString(36).substring(2, 10);
-    // KHÔNG set playerColor ở đây nữa, sẽ nhận từ server
     socket.emit("join", {
       room: currentRoom,
       mode: "ai",
       aiLevel: currentAILevel,
-      playerColor: "white", // Vẫn gửi màu mặc định cho AI
+      playerColor: "white",
     });
 
-    // Reset undo/redo state
     updateUndoRedoButtons(false, false);
 
     const statusEl = document.getElementById("status");
@@ -276,7 +369,6 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
     bK: "vuaden",
   };
 
-  // Tạo board mới
   const newBoardDiv = document.createElement("div");
   newBoardDiv.id = "chessboard";
   newBoardDiv.style.display = "grid";
@@ -297,7 +389,6 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
 
       const piece = board[row][col];
 
-      // Kiểm tra nếu đây là ô di chuyển đến
       const isMoveToSquare =
         toSquare && toSquare.row === row && toSquare.col === col;
       const isMoveFromSquare =
@@ -312,12 +403,10 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
         img.style.height = "60px";
         img.style.pointerEvents = "none";
 
-        // Thêm hiệu ứng cho quân cờ vừa di chuyển
         if (isMoveToSquare) {
           img.classList.add("piece-moving");
           square.classList.add("piece-moving");
 
-          // Thêm hiệu ứng capture nếu có quân bị ăn
           if (
             currentBoard[row] &&
             currentBoard[row][col] !== "--" &&
@@ -335,7 +424,6 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
         square.appendChild(img);
       }
 
-      // Đánh dấu ô được chọn
       if (
         selectedSquare &&
         selectedSquare.row === row &&
@@ -344,7 +432,6 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
         square.classList.add("selected");
       }
 
-      // Thêm hiệu ứng cho ô đi từ (nếu có)
       if (isMoveFromSquare && piece === "--") {
         square.style.backgroundColor = "rgba(0, 100, 255, 0.2)";
         square.style.transition = "background-color 1s ease";
@@ -355,16 +442,14 @@ function drawBoard(board, fromSquare = null, toSquare = null) {
     }
   }
 
-  // Thay thế board cũ bằng board mới
   if (boardDiv.parentNode) {
     boardDiv.parentNode.replaceChild(newBoardDiv, boardDiv);
   }
 
-  // Cập nhật reference
   boardDiv = newBoardDiv;
 }
 
-// SỬA QUAN TRỌNG: Handle click board - sửa logic kiểm tra lượt đi và thêm animation
+// SỬA QUAN TRỌNG: Handle click board
 function handleClick(row, col, piece) {
   if (!currentRoom) {
     alert("Bạn cần join room trước!");
@@ -377,9 +462,8 @@ function handleClick(row, col, piece) {
     }, màu người chơi: ${playerColor}`
   );
 
-  // THÊM: Kiểm tra xem ô được click có quân cờ không và có phải quân của người chơi không
   if (piece !== "--") {
-    const pieceColor = piece[0]; // 'w' hoặc 'b'
+    const pieceColor = piece[0];
     const isPlayerPiece =
       (playerColor === "white" && pieceColor === "w") ||
       (playerColor === "black" && pieceColor === "b");
@@ -391,7 +475,6 @@ function handleClick(row, col, piece) {
     }
   }
 
-  // SỬA: Kiểm tra lượt đi dựa trên màu người chơi và lượt hiện tại
   const isPlayerTurn =
     (playerColor === "white" && currentWhiteToMove) ||
     (playerColor === "black" && !currentWhiteToMove);
@@ -411,7 +494,6 @@ function handleClick(row, col, piece) {
     const from = selectedSquare;
     const to = { row, col };
 
-    // THÊM: Hiển thị loading nếu là AI
     if (currentMode === "ai") {
       document.getElementById("turn").innerText = "Đang xử lý...";
     }
@@ -420,23 +502,19 @@ function handleClick(row, col, piece) {
       `🎯 Di chuyển từ [${from.row}, ${from.col}] đến [${to.row}, ${to.col}]`
     );
 
-    // THÊM: Tạo hiệu ứng di chuyển tạm thời
     const tempBoard = JSON.parse(JSON.stringify(currentBoard));
     const movingPiece = tempBoard[from.row][from.col];
     tempBoard[from.row][from.col] = "--";
     tempBoard[to.row][to.col] = movingPiece;
 
-    // Hiển thị animation
     animateMove(from, to, tempBoard);
 
-    // Gửi move đến server sau khi bắt đầu animation
     setTimeout(() => {
       socket.emit("make_move", { room: currentRoom, from, to });
     }, 400);
 
     selectedSquare = null;
   } else {
-    // THÊM: Chỉ cho phép chọn quân của mình
     if (piece !== "--") {
       const pieceColor = piece[0];
       const isPlayerPiece =
@@ -518,7 +596,6 @@ function updateUndoRedoButtons(canUndoState, canRedoState) {
   if (undoBtn) {
     undoBtn.disabled = !canUndoState;
     undoBtn.title = canUndoState ? "Hủy nước đi (Ctrl+Z)" : "Không thể undo";
-    // THÊM: Cập nhật màu sắc cho nút
     if (canUndoState) {
       undoBtn.style.background = "linear-gradient(45deg, #ff69b4, #ff1493)";
     } else {
@@ -531,7 +608,6 @@ function updateUndoRedoButtons(canUndoState, canRedoState) {
     redoBtn.title = canRedoState
       ? "Làm lại nước đi (Ctrl+Y)"
       : "Không thể redo";
-    // THÊM: Cập nhật màu sắc cho nút
     if (canRedoState) {
       redoBtn.style.background = "linear-gradient(45deg, #ff69b4, #ff1493)";
     } else {
@@ -565,7 +641,6 @@ socket.on("player_assigned", (data) => {
   playerColor = data.color;
   console.log(`🎯 Server gán màu cho bạn: ${playerColor}`);
 
-  // Cập nhật status với màu thực tế
   const statusEl = document.getElementById("status");
   if (statusEl) {
     const colorText = playerColor === "white" ? "Trắng" : "Đen";
@@ -589,7 +664,6 @@ socket.on("room_full", (data) => {
 // THÊM: Socket events cho undo/redo
 socket.on("undo_success", (data) => {
   console.log("✅ " + data.msg);
-  // Có thể thêm thông báo toast ở đây
 });
 
 socket.on("undo_failed", (data) => {
@@ -599,7 +673,6 @@ socket.on("undo_failed", (data) => {
 
 socket.on("redo_success", (data) => {
   console.log("✅ " + data.msg);
-  // Có thể thêm thông báo toast ở đây
 });
 
 socket.on("redo_failed", (data) => {
@@ -610,10 +683,7 @@ socket.on("redo_failed", (data) => {
 // THÊM: Socket event cho game over từ đầu hàng
 socket.on("game_over", (data) => {
   if (data.type === "resign") {
-    // Hiển thị thông báo đầu hàng
     alert(data.msg);
-
-    // Có thể thêm hiệu ứng visual đặc biệt cho đầu hàng
     const boardDiv = document.getElementById("chessboard");
     if (boardDiv) {
       boardDiv.style.opacity = "0.7";
@@ -622,7 +692,6 @@ socket.on("game_over", (data) => {
       }, 1000);
     }
   } else {
-    // Xử lý thông báo game over thông thường
     alert(data.msg);
   }
 });
@@ -637,15 +706,13 @@ socket.on("connect", () => {
   console.log("✅ Connected to server");
 });
 
-// SỬA QUAN TRỌNG: Socket event board_update - cập nhật biến currentWhiteToMove và undo/redo state
+// SỬA QUAN TRỌNG: Socket event board_update
 socket.on("board_update", (data) => {
-  // Kiểm tra xem có phải là update từ AI không (không phải từ người chơi hiện tại)
   const wasPlayerTurn = currentWhiteToMove;
   const oldBoard = currentBoard;
   currentBoard = data.board;
-  currentWhiteToMove = data.whiteToMove; // THÊM: Cập nhật trạng thái lượt đi
+  currentWhiteToMove = data.whiteToMove;
 
-  // Tìm nước đi vừa thực hiện (so sánh với board cũ)
   let moveFrom = null;
   let moveTo = null;
 
@@ -665,15 +732,12 @@ socket.on("board_update", (data) => {
     }
   }
 
-  // Nếu tìm thấy nước đi, hiển thị animation
   if (moveFrom && moveTo) {
     animateMove(moveFrom, moveTo, currentBoard);
   } else {
-    // Nếu không tìm thấy (reset game, etc.), vẽ bình thường
     drawBoard(currentBoard);
   }
 
-  // THÊM: Phát âm thanh nếu là lượt của AI (khi lượt thay đổi từ người chơi sang AI)
   if (
     currentMode === "ai" &&
     wasPlayerTurn &&
@@ -686,12 +750,10 @@ socket.on("board_update", (data) => {
     }, 300);
   }
 
-  // THÊM: Cập nhật trạng thái nút undo/redo
   const canUndoState = data.canUndo !== undefined ? data.canUndo : canUndo;
   const canRedoState = data.canRedo !== undefined ? data.canRedo : canRedo;
   updateUndoRedoButtons(canUndoState, canRedoState);
 
-  // SỬA: Cập nhật hiển thị lượt đi với thông tin chi tiết
   const turnEl = document.getElementById("turn");
   if (turnEl) {
     const currentTurnColor = data.whiteToMove ? "Trắng" : "Đen";
@@ -724,7 +786,6 @@ socket.on("invalid_move", (data) => {
 
 // THÊM: Keyboard shortcuts cho undo/redo và đầu hàng
 document.addEventListener("keydown", function (event) {
-  // Chỉ xử lý khi đang ở trong game section
   const gameSection = document.getElementById("game-section");
   if (!gameSection || gameSection.style.display !== "block") {
     return;
@@ -755,7 +816,7 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-// THÊM: Cho phép user bật nhạc bằng 1 click bất kỳ (vượt autoplay policy)
+// THÊM: Cho phép user bật nhạc bằng 1 click bất kỳ
 document.addEventListener(
   "click",
   function initAudio() {
@@ -769,7 +830,6 @@ document.addEventListener(
           console.log("❌ Lỗi phát nhạc:", error);
         });
     }
-    // Xóa event listener sau khi click đầu tiên
     document.removeEventListener("click", initAudio);
   },
   { once: true }
@@ -780,10 +840,8 @@ window.addEventListener("message", (event) => {
   console.log("Received message from playmode iframe:", event.data);
 
   if (event.data && event.data.type === "GAME_START") {
-    // Xử lý message mới - bắt đầu game từ cấu hình
     startGameFromConfig(event.data);
   } else if (event.data && event.data.type === "MODE_SELECTED") {
-    // Giữ lại để tương thích ngược
     selectMode(event.data.mode, event.data.aiLevel);
   } else if (event.data && event.data.type === "GO_BACK") {
     showSection("home-section");
@@ -791,20 +849,13 @@ window.addEventListener("message", (event) => {
   }
 });
 
-// Sync: Init app
+// Cập nhật window.onload để kiểm tra đăng nhập
 window.onload = function () {
-  // Khởi tạo nhạc nền
   initBackgroundMusic();
-
-  // THÊM: Khởi tạo âm thanh di chuyển
   initMoveSound();
-
   showSection("home-section");
-
-  // THÊM: Khởi tạo undo/redo state
   updateUndoRedoButtons(false, false);
-
-  // Bật nhạc nền sau khi khởi tạo
+  checkLoginStatus();
   setTimeout(() => {
     manageBackgroundMusic("home-section");
   }, 500);
